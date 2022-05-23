@@ -3,6 +3,8 @@ import { createPinia } from "pinia";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import VueVirtualScroller from "vue-virtual-scroller";
+import { http } from "@/utils";
+import VueAxios from "vue-axios";
 import App from "./App.vue";
 import router from "./router";
 
@@ -32,8 +34,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 const app = createApp(App)
   .use(IonicVue)
   .use(router)
+  .use(VueAxios, http)
   .use(createPinia())
   .use(VueVirtualScroller);
+
+app.provide("axios", app.config.globalProperties.axios);
 
 router.isReady().then(() => {
   app.mount("#app");

@@ -15,7 +15,9 @@
       <ion-grid class="ion-padding-horizontal">
         <ion-row>
           <ion-col>
-            <h1>Halo, <strong>Welson</strong></h1>
+            <h1>
+              Halo, <strong>{{ auth.user.nama }}</strong>
+            </h1>
           </ion-col>
         </ion-row>
         <ion-row>
@@ -34,6 +36,7 @@
   </ion-page>
 </template>
 <script lang="ts" setup>
+import { useAuth } from "@/stores";
 import {
   IonButton,
   IonGrid,
@@ -45,4 +48,6 @@ import {
   IonTitle,
   IonContent,
 } from "@ionic/vue";
+
+const auth = useAuth();
 </script>
