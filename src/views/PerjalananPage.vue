@@ -65,7 +65,7 @@ import {
   modalController,
 } from "@ionic/vue";
 import { onMounted, reactive, ref } from "vue";
-import ModalCariAlamat from "@/components/perjalanan/ModalCariAlamat.vue";
+import ModalCariAlamat from "@/components/Perjalanan/ModalCariAlamat.vue";
 import { GeolocateControl, Map, Marker, LngLat, LngLatBounds } from "mapbox-gl";
 import { Geolocation } from "@capacitor/geolocation";
 import { Feature, LineString } from "geojson";
