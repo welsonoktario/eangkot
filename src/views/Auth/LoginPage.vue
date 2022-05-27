@@ -52,6 +52,7 @@ import {
 } from "@ionic/vue";
 import { useAuth } from "@/stores/auth";
 import { User } from "@/models/user";
+import { http } from "@/utils";
 import AppLayout from "@/layouts/AppLayout.vue";
 import ModalOtp from "@/components/Auth/ModalOtp.vue";
 
@@ -65,6 +66,10 @@ const login = async () => {
 
   if (data.msg === "REGISTERED") {
     await auth.setAuthUser(data.data.user as User, data.data.token);
+    http.defaults.headers.common["Authorization"] = `Bearer ${data.data.token}`;
+    http.defaults.params = {
+      user: data.data.user.id,
+    };
     ionRouter.push("/tabs/home");
   } else if (data.msg === "REGISTER") {
     ionRouter.push(`/auth/register/${phone.value}`);

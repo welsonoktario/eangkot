@@ -1,11 +1,12 @@
 <template>
-  <ion-page>
-    <ion-header>
+  <AppLayout>
+    <template #header>
       <ion-toolbar>
         <ion-title>Home</ion-title>
       </ion-toolbar>
-    </ion-header>
-    <ion-content :fullscreen="true">
+    </template>
+
+    <template #content>
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">eAngkot</ion-title>
@@ -13,10 +14,10 @@
       </ion-header>
 
       <ion-grid class="ion-padding-horizontal">
-        <ion-row>
+        <ion-row v-if="user">
           <ion-col>
             <h1>
-              Halo, <strong>{{ auth.user.nama }}</strong>
+              Halo, <strong>{{ user.nama }}</strong>
             </h1>
           </ion-col>
         </ion-row>
@@ -32,22 +33,36 @@
           <ion-col class="ion-padding-top"> </ion-col>
         </ion-row>
       </ion-grid>
-    </ion-content>
-  </ion-page>
+    </template>
+  </AppLayout>
 </template>
 <script lang="ts" setup>
+import { User } from "@/models";
 import { useAuth } from "@/stores";
+import { Storage } from "@capacitor/storage";
 import {
   IonButton,
   IonGrid,
   IonRow,
   IonCol,
-  IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonContent,
 } from "@ionic/vue";
+import { onMounted, ref } from "vue";
+import AppLayout from "@/layouts/AppLayout.vue";
 
 const auth = useAuth();
+const user = ref<User>(null);
+
+onMounted(async () => await loadUser());
+
+const loadUser = async () => {
+  const { value } = await Storage.get({ key: "user" });
+  const token = await Storage.get({ key: "token" });
+  const userJson = JSON.parse(value);
+
+  user.value = userJson;
+  auth.setAuthUser(user.value, token.value);
+};
 </script>

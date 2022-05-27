@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "@ionic/vue-router";
 import { RouteRecordRaw } from "vue-router";
 import TabsPage from "@/views/TabsPage.vue";
 import { Storage } from "@capacitor/storage";
+import { http } from "@/utils";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -57,10 +58,16 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   if (!to.name.toString().includes("auth.")) {
-    const auth = await Storage.get({ key: "user" });
+    const user = await Storage.get({ key: "user" });
+    const token = await Storage.get({ key: "token" });
 
-    if (auth.value == "undefined") {
+    if (user.value == "undefined") {
       return { name: "auth.login" };
+    } else {
+      http.defaults.headers.common["Authorization"] = `Bearer ${token.value}`;
+      http.defaults.params = {
+        user: JSON.parse(user.value).id,
+      };
     }
   }
 });
