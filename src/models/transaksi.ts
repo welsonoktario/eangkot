@@ -5,5 +5,6 @@ export interface Transaksi {
   tanggal: string;
   ongkos: number;
   detail: TransaksiDetail;
+  pesanan: any;
   ulasan?: Ulasan;
 }

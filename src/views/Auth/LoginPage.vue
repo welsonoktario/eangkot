@@ -60,16 +60,14 @@ const ionRouter = useIonRouter();
 const axios: AxiosStatic = inject("axios");
 const auth = useAuth();
 const phone = ref("");
+
 const login = async () => {
   const res = await axios.post("auth/login", { phone: phone.value });
   const data = await res.data;
 
   if (data.msg === "REGISTERED") {
     await auth.setAuthUser(data.data.user as User, data.data.token);
-    http.defaults.headers.common["Authorization"] = `Bearer ${data.data.token}`;
-    http.defaults.params = {
-      user: data.data.user.id,
-    };
+
     ionRouter.push("/tabs/home");
   } else if (data.msg === "REGISTER") {
     ionRouter.push(`/auth/register/${phone.value}`);
@@ -100,5 +98,19 @@ const otp = async () => {
   display: flex;
   height: 100%;
   vertical-align: middle;
+}
+
+.spin {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+ion-spinner {
+  width: 28px;
+  height: 28px;
+  stroke: #444;
+  fill: #222;
 }
 </style>

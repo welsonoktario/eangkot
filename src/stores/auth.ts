@@ -1,6 +1,7 @@
 import { User } from "@/models/user";
 import { defineStore } from "pinia";
 import { Storage } from "@capacitor/storage";
+import { http } from "@/utils";
 
 type AuthState = {
   user: User | undefined;
@@ -18,21 +19,27 @@ export const useAuth = defineStore("auth", {
     authToken: (state) => state.token,
   },
   actions: {
-    async setAuthUser(user: User, token: string) {
+    async setAuthUser(user: User, token: string = null) {
       this.user = user;
-      this.token = token;
 
-      await Storage.clear();
+      await Storage.remove({ key: "user" });
       await Storage.set({ key: "user", value: JSON.stringify(user) });
-      await Storage.set({ key: "token", value: token });
+
+      if (token) {
+        await Storage.remove({ key: "token" });
+        this.token = token;
+        await Storage.set({ key: "token", value: token });
+      }
     },
     async checkAuth() {
       const user = await Storage.get({ key: "user" });
       const token = await Storage.get({ key: "token" });
 
-      if (user.value && token.value) {
+      if (user.value != "null" && token.value != "null") {
         this.user = JSON.parse(user.value);
         this.token = token.value;
+
+        http.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
 
         return true;
       }

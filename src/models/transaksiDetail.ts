@@ -1,4 +1,4 @@
 export interface TransaksiDetail {
-  durasiPerjalanan: number;
-  jarakPerjalanan: number;
+  durasi: number;
+  jarak: number;
 }

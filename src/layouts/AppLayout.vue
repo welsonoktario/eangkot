@@ -1,22 +1,66 @@
 <template>
-  <ion-page>
-    <ion-header>
-      <slot name="header"></slot>
-    </ion-header>
+  <IonPage>
+    <IonHeader :collapse="largeTitle ? 'fade' : null" :translucent="largeTitle">
+      <IonToolbar>
+        <slot name="header">
+          <IonTitle> {{ title }} </IonTitle>
+        </slot>
+      </IonToolbar>
+    </IonHeader>
 
-    <ion-content>
+    <IonContent>
+      <IonHeader v-if="largeTitle" collapse="condense">
+        <IonToolbar>
+          <IonTitle size="large">{{ title }}</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+
       <slot name="content"></slot>
-    </ion-content>
+    </IonContent>
 
-    <ion-footer v-if="slots['footer']">
+    <IonFooter v-if="slots['footer']">
       <slot name="footer"></slot>
-    </ion-footer>
-  </ion-page>
+    </IonFooter>
+  </IonPage>
 </template>
 
 <script lang="ts" setup>
-import { useSlots } from "vue";
-import { IonPage, IonContent, IonHeader, IonFooter } from "@ionic/vue";
+import { defineProps, useSlots } from "vue";
+import {
+  IonPage,
+  IonContent,
+  IonHeader,
+  IonFooter,
+  IonToolbar,
+  IonTitle,
+} from "@ionic/vue";
+
+defineProps({
+  title: String,
+  largeTitle: Boolean,
+});
 
 const slots = useSlots();
 </script>
+
+<style>
+.md ion-toolbar {
+  --ion-background-color: var(--ion-color-primary);
+}
+
+.md ion-toolbar ion-title {
+  --color: var(--ion-color-primary-contrast);
+}
+
+.md ion-toolbar ion-buttons ion-button {
+  --color: var(--ion-color-primary-contrast) !important;
+}
+
+.ios ion-toolbar ion-buttons ion-button {
+  --color: var(--ion-color-medium) !important;
+}
+
+.md ion-toolbar ion-buttons ion-back-button {
+  --color: var(--ion-color-primary-contrast) !important;
+}
+</style>

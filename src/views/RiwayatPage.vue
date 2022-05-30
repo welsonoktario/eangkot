@@ -1,11 +1,5 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <IonToolbar>
-        <IonTitle> Riwayat </IonTitle>
-      </IonToolbar>
-    </template>
-
+  <AppLayout title="Riwayat" :largeTitle="true">
     <template #content>
       <DynamicScroller
         v-if="success"
@@ -60,12 +54,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject, onMounted, computed } from "vue";
-import { useRiwayat } from "@/stores/riwayat";
+import { ref, inject, onMounted, computed, getCurrentInstance } from "vue";
+import { useAuth, useRiwayat } from "@/stores";
 import { AxiosStatic } from "axios";
 import {
-  IonToolbar,
-  IonTitle,
   IonSpinner,
   IonGrid,
   IonRow,
@@ -73,12 +65,14 @@ import {
   IonButton,
   modalController,
 } from "@ionic/vue";
-import AppLayout from "@/layouts/AppLayout.vue";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 import { Transaksi } from "@/models";
+import AppLayout from "@/layouts/AppLayout.vue";
 import ModalDetailRiwayat from "@/components/Riwayat/ModalDetailRiwayat.vue";
 import CardRiwayat from "@/components/Riwayat/CardRiwayat.vue";
 
+const context = getCurrentInstance();
+const auth = useAuth();
 const riwayat = useRiwayat();
 const axios: AxiosStatic = inject("axios");
 
@@ -89,7 +83,7 @@ const error = ref({
 });
 const results = ref<Transaksi[]>([]);
 
-onMounted(() => loadRiwayat());
+onMounted(async () => await loadRiwayat());
 
 const empty = computed(
   () => !isLoading.value && !error.value.isError && !results.value.length
@@ -100,12 +94,13 @@ const success = computed(
 );
 
 const loadRiwayat = async () => {
-  const res = await axios.get("transaksi");
+  const res = await axios.get(`transaksi?user_id=${auth.authUser.id}`);
   const data = await res.data;
   isLoading.value = !isLoading.value;
 
   if (data.status === "OK") {
     results.value = data.data;
+    console.log(results.value.length);
 
     if (results.value.length) {
       riwayat.setTransaksis(results.value);
@@ -116,7 +111,11 @@ const loadRiwayat = async () => {
 const detail = async (transaksi: Transaksi) => {
   const modal = await modalController.create({
     component: ModalDetailRiwayat,
-    componentProps: transaksi,
+    componentProps: {
+      transaksi,
+    },
+    canDismiss: true,
+    presentingElement: context.parent.refs.ionRouterOutlet as HTMLElement,
   });
 
   await modal.present();

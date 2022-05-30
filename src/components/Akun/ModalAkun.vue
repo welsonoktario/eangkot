@@ -1,27 +1,29 @@
 <template>
-  <AppLayout>
+  <AppLayout title="Ubah Profil">
     <template #header>
-      <IonToolbar>
-        <IonButtons slot="end">
-          <IonButton @click="back()">
-            <IonIcon
-              slot="icon-only"
-              md="close-outline"
-              ios="close-circle"
-              color="medium"
-            ></IonIcon>
-          </IonButton>
-        </IonButtons>
-        <IonTitle>Ubah Profil</IonTitle>
-      </IonToolbar>
+      <IonButtons slot="end">
+        <IonButton @click="back()">
+          <IonIcon
+            slot="icon-only"
+            :md="closeOutline"
+            :ios="closeCircle"
+          ></IonIcon>
+        </IonButton>
+      </IonButtons>
+      <IonTitle>Ubah Profil</IonTitle>
     </template>
 
     <template #content>
       <form @submit.prevent="ubahProfil()">
-        <IonList>
+        <IonList :inset="true" class="ion-padding">
           <IonItem>
             <IonLabel position="floating">Nama</IonLabel>
-            <IonInput type="text" name="nama" placeholder="Nama"></IonInput>
+            <IonInput
+              type="text"
+              name="nama"
+              placeholder="Nama"
+              v-model="akun.nama"
+            ></IonInput>
           </IonItem>
           <IonItem>
             <IonLabel position="floating">Email</IonLabel>
@@ -29,45 +31,67 @@
               type="email"
               name="email"
               :placeholder="akun.email ? 'Email' : 'Tambah email'"
+              v-model="akun.email"
             ></IonInput>
           </IonItem>
           <IonItem>
             <IonLabel position="floating">No. HP</IonLabel>
-            <IonInput type="tel" name="noHp" placeholder="No. HP"></IonInput>
+            <IonInput
+              type="tel"
+              name="noHp"
+              placeholder="No. HP"
+              v-model="akun.noHp"
+            ></IonInput>
           </IonItem>
         </IonList>
       </form>
     </template>
 
     <template #footer>
-      <ion-button
+      <IonButton
         @click="ubahProfil()"
         class="ion-margin"
         expand="block"
         fill="solid"
       >
         Simpan
-      </ion-button>
+      </IonButton>
     </template>
   </AppLayout>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, inject } from "vue";
+import { inject, ref } from "vue";
+import { useAuth } from "@/stores";
+import { AxiosStatic } from "axios";
 import {
-  IonToolbar,
   IonButtons,
   IonButton,
   IonIcon,
   IonTitle,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonInput,
+  modalController,
 } from "@ionic/vue";
+import { closeOutline, closeCircle } from "ionicons/icons";
 import AppLayout from "@/layouts/AppLayout.vue";
 
-const props = defineProps({
-  akun: Object,
-});
+const auth = useAuth();
+const axios: AxiosStatic = inject("axios");
+
+const akun = ref(auth.authUser);
 
 const ubahProfil = async () => {
-  return true;
+  const res = await axios.patch(`user/${akun.value.id}`, akun.value);
+  const data = await res.data;
+
+  if (data.status === "OK") {
+    await auth.setAuthUser(akun.value);
+    await modalController.dismiss(true);
+  }
 };
+
+const back = async () => await modalController.dismiss();
 </script>

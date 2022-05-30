@@ -1,38 +1,30 @@
 <template>
-  <AppLayout>
+  <AppLayout title="eAngkot" :largeTitle="true">
     <template #header>
-      <ion-toolbar>
-        <ion-title>Home</ion-title>
-      </ion-toolbar>
+      <IonTitle>Home</IonTitle>
     </template>
 
     <template #content>
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">eAngkot</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
-      <ion-grid class="ion-padding-horizontal">
-        <ion-row v-if="user">
-          <ion-col>
+      <IonGrid class="ion-padding-horizontal">
+        <IonRow v-if="user">
+          <IonCol>
             <h1>
               Halo, <strong>{{ user.nama }}</strong>
             </h1>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
+          </IonCol>
+        </IonRow>
+        <IonRow>
+          <IonCol>
             <h3>Mau kemana hari ini?</h3>
             <ion-button router-link="/perjalanan" expand="block">
               Cari Angkot
             </ion-button>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col class="ion-padding-top"> </ion-col>
-        </ion-row>
-      </ion-grid>
+          </IonCol>
+        </IonRow>
+        <IonRow>
+          <IonCol class="ion-padding-top"> </IonCol>
+        </IonRow>
+      </IonGrid>
     </template>
   </AppLayout>
 </template>
@@ -45,8 +37,6 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonHeader,
-  IonToolbar,
   IonTitle,
 } from "@ionic/vue";
 import { onMounted, ref } from "vue";
