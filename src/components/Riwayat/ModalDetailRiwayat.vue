@@ -58,7 +58,7 @@
           <div class="select-wrapper">
             <IonLabel>Rating</IonLabel>
             <IonSelect
-              :value="transaksi.ulasan ? transaksi.ulasan.rating : null"
+              v-model="ulasan.rating"
               :disabled="transaksi.ulasan ? true : false"
             >
               <IonSelectOption value="1">1</IonSelectOption>
@@ -72,19 +72,32 @@
         <IonItem class="ion-margin-bottom item-input">
           <IonLabel position="stacked">Komentar</IonLabel>
           <IonTextarea
-            rows="3"
-            :readonly="transaksi.ulasan"
-            :value="transaksi.ulasan ? transaksi.ulasan.komentar : null"
             placeholder="Berikan komentar"
+            rows="3"
+            v-model="ulasan.komentar"
+            :readonly="transaksi.ulasan"
           ></IonTextarea>
         </IonItem>
       </IonList>
+    </template>
+
+    <template v-if="!transaksi.ulasan" #footer>
+      <IonButton
+        @click="addUlasan()"
+        class="ion-margin"
+        expand="block"
+        fill="solid"
+      >
+        Tambah Ulasan
+      </IonButton>
     </template>
   </AppLayout>
 </template>
 
 <script lang="ts" setup>
-import { computed, defineProps } from "vue";
+import { computed, defineProps, inject, reactive } from "vue";
+import { useRiwayat } from "@/stores";
+import { AxiosStatic } from "axios";
 import {
   IonTitle,
   IonButtons,
@@ -117,8 +130,11 @@ import {
   star,
   starOutline,
 } from "ionicons/icons";
-import { rupiah } from "@/utils";
+import { rupiah, showToast } from "@/utils";
 import AppLayout from "@/layouts/AppLayout.vue";
+
+const riwayat = useRiwayat();
+const axios: AxiosStatic = inject("axios");
 
 const props = defineProps({
   transaksi: {
@@ -127,9 +143,31 @@ const props = defineProps({
   },
 });
 
+const ulasan = reactive({
+  rating: null,
+  komentar: null,
+});
+
 const ongkos = computed(() => rupiah(props.transaksi.ongkos));
 
 const back = async () => await modalController.dismiss();
+
+const addUlasan = async () => {
+  try {
+    const res = await axios.patch(`transaksi/${props.transaksi.id}`, ulasan);
+    const data = await res.data;
+
+    if (data.status == "OK") {
+      const transaksi = riwayat.findTransaksi(props.transaksi.id);
+      transaksi.ulasan = data.data;
+      riwayat.updateTransaksi(transaksi);
+
+      await modalController.dismiss(true);
+    }
+  } catch (err) {
+    await showToast(err.response.data.msg, "danger");
+  }
+};
 </script>
 
 <style scoped>

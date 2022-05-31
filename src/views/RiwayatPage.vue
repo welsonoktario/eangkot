@@ -70,6 +70,7 @@ import { Transaksi } from "@/models";
 import AppLayout from "@/layouts/AppLayout.vue";
 import ModalDetailRiwayat from "@/components/Riwayat/ModalDetailRiwayat.vue";
 import CardRiwayat from "@/components/Riwayat/CardRiwayat.vue";
+import { showToast } from "@/utils";
 
 const context = getCurrentInstance();
 const auth = useAuth();
@@ -100,7 +101,6 @@ const loadRiwayat = async () => {
 
   if (data.status === "OK") {
     results.value = data.data;
-    console.log(results.value.length);
 
     if (results.value.length) {
       riwayat.setTransaksis(results.value);
@@ -119,6 +119,12 @@ const detail = async (transaksi: Transaksi) => {
   });
 
   await modal.present();
+
+  const success = await (await modal.onDidDismiss()).data;
+
+  if (success) {
+    showToast("Ulasan berhasil ditambahkan", "success");
+  }
 };
 </script>
 

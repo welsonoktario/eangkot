@@ -1,31 +1,29 @@
 <template>
-  <app-layout>
+  <AppLayout>
     <template #header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
-        </ion-buttons>
+      <IonButtons slot="start">
+        <IonBackButton></IonBackButton>
+      </IonButtons>
 
-        <ion-title>Register</ion-title>
-      </ion-toolbar>
+      <IonTitle>Register</IonTitle>
     </template>
 
     <template #content>
-      <ion-list>
-        <ion-item>
-          <ion-label position="floating">Nama</ion-label>
-          <ion-input
+      <IonList>
+        <IonItem>
+          <IonLabel position="floating">Nama</IonLabel>
+          <IonInput
             required
             type="text"
             autocomplete="name"
             v-model="nama"
-          ></ion-input>
-        </ion-item>
-      </ion-list>
+          ></IonInput>
+        </IonItem>
+      </IonList>
     </template>
 
     <template #footer>
-      <ion-button
+      <IonButton
         @click="register()"
         class="ion-margin"
         expand="block"
@@ -33,9 +31,9 @@
         :disabled="nama ? false : true"
       >
         Daftar
-      </ion-button>
+      </IonButton>
     </template>
-  </app-layout>
+  </AppLayout>
 </template>
 
 <script lang="ts" setup>
@@ -43,9 +41,8 @@ import { ref, inject } from "vue";
 import { useRoute } from "vue-router";
 import { useAuth } from "@/stores/auth";
 import { AxiosStatic } from "axios";
-import AppLayout from "@/layouts/AppLayout.vue";
+import { User } from "@/models/user";
 import {
-  IonToolbar,
   IonButton,
   IonButtons,
   IonBackButton,
@@ -56,7 +53,7 @@ import {
   IonInput,
   useIonRouter,
 } from "@ionic/vue";
-import { User } from "@/models/user";
+import AppLayout from "@/layouts/AppLayout.vue";
 
 const route = useRoute();
 const ionRouter = useIonRouter();

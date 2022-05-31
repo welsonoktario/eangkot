@@ -35,7 +35,12 @@ export const useAuth = defineStore("auth", {
       const user = await Storage.get({ key: "user" });
       const token = await Storage.get({ key: "token" });
 
-      if (user.value != "null" && token.value != "null") {
+      if (
+        user.value &&
+        user.value != "null" &&
+        token.value &&
+        token.value != "null"
+      ) {
         this.user = JSON.parse(user.value);
         this.token = token.value;
 
@@ -45,6 +50,11 @@ export const useAuth = defineStore("auth", {
       }
 
       return false;
+    },
+    async logout() {
+      this.user = undefined;
+      this.token = undefined;
+      await Storage.clear();
     },
   },
 });

@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from "@ionic/vue-router";
 import { RouteRecordRaw } from "vue-router";
-import TabsPage from "@/views/TabsPage.vue";
 import { useAuth } from "@/stores";
+import AuthPage from "@/views/Auth/AuthPage.vue";
+import TabsPage from "@/views/TabsPage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/auth/login",
+    redirect: "/tabs",
   },
   {
     path: "/tabs/",
@@ -34,18 +35,29 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: "/auth/login",
-    name: "auth.login",
-    component: () => import("@/views/Auth/LoginPage.vue"),
-  },
-  {
-    path: "/auth/register/:phone",
-    name: "auth.register",
-    component: () => import("@/views/Auth/RegisterPage.vue"),
+    path: "/auth/",
+    name: "auth",
+    component: AuthPage,
+    children: [
+      {
+        path: "",
+        redirect: "/auth/login",
+      },
+      {
+        path: "login",
+        name: "auth.login",
+        component: () => import("@/views/Auth/LoginPage.vue"),
+      },
+      {
+        path: "register/:phone",
+        name: "auth.register",
+        component: () => import("@/views/Auth/RegisterPage.vue"),
+      },
+    ],
   },
   {
     path: "/perjalanan",
-    name: "Perjalanan",
+    name: "perjalanan",
     component: () => import("@/views/PerjalananPage.vue"),
   },
 ];

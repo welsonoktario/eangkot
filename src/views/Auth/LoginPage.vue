@@ -1,38 +1,38 @@
 <template>
-  <app-layout>
+  <AppLayout :fullscreen="true">
     <template #content>
-      <ion-grid style="height: 100%" class="ion-padding-bottom">
-        <ion-row style="height: 50%">
-          <ion-col>
+      <IonGrid style="height: 100%" class="ion-padding-bottom">
+        <IonRow style="height: 50%">
+          <IonCol>
             <h1 class="ion-text-center">eAngkot</h1>
-          </ion-col>
-        </ion-row>
-        <ion-row
+          </IonCol>
+        </IonRow>
+        <IonRow
           class="ion-align-items-end ion-padding-horizontal"
           style="height: 50%"
         >
-          <ion-col>
-            <ion-list lines="full">
+          <IonCol>
+            <IonList lines="full">
               <form class="ion-margin-horizontal" @submit.prevent="otp()">
-                <ion-item>
-                  <ion-label position="floating">No. HP</ion-label>
-                  <ion-input required v-model="phone" type="tel"></ion-input>
-                </ion-item>
-                <ion-button
+                <IonItem>
+                  <IonLabel position="floating">No. HP</IonLabel>
+                  <IonInput required v-model="phone" type="tel"></IonInput>
+                </IonItem>
+                <IonButton
                   class="ion-margin-vertical"
                   expand="block"
                   color="primary"
                   type="submit"
                 >
                   Mulai
-                </ion-button>
+                </IonButton>
               </form>
-            </ion-list>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+            </IonList>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
     </template>
-  </app-layout>
+  </AppLayout>
 </template>
 
 <script lang="ts" setup>
@@ -52,7 +52,6 @@ import {
 } from "@ionic/vue";
 import { useAuth } from "@/stores/auth";
 import { User } from "@/models/user";
-import { http } from "@/utils";
 import AppLayout from "@/layouts/AppLayout.vue";
 import ModalOtp from "@/components/Auth/ModalOtp.vue";
 

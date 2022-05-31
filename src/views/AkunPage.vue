@@ -2,7 +2,7 @@
   <AppLayout title="Akun" :largeTitle="true">
     <template #content>
       <IonItem class="ion-padding-vertical" lines="none">
-        <IonLabel class="ion-text-center">
+        <IonLabel v-if="auth.authUser" class="ion-text-center">
           <h1>{{ auth.authUser.nama }}</h1>
           <p v-if="auth.authUser.email">{{ auth.authUser.email }}</p>
           <p>{{ auth.authUser.noHp }}</p>
@@ -26,7 +26,7 @@
         <IonItem @click="password()" button detail>
           <IonIcon slot="start" :md="key" :ios="keyOutline"></IonIcon>
           <IonLabel>{{
-            auth.authUser.secure ? "Ubah password" : "Tambah password"
+            auth.authUser?.secure ? "Ubah password" : "Tambah password"
           }}</IonLabel>
         </IonItem>
         <IonItem @click="share()" button detail>
@@ -38,6 +38,21 @@
           <IonLabel>Bantuan</IonLabel>
         </IonItem>
       </IonList>
+      <IonItem
+        @click="logout()"
+        lines="none"
+        class="ion-margin-top"
+        button
+        detail
+      >
+        <IonIcon
+          slot="start"
+          :md="logOut"
+          :ios="logOutOutline"
+          color="danger"
+        ></IonIcon>
+        <IonLabel color="danger">Keluar</IonLabel>
+      </IonItem>
     </template>
   </AppLayout>
 </template>
@@ -51,7 +66,7 @@ import {
   IonLabel,
   IonIcon,
   modalController,
-  toastController,
+  useIonRouter,
 } from "@ionic/vue";
 import {
   time,
@@ -64,14 +79,18 @@ import {
   peopleOutline,
   help,
   helpCircleOutline,
-  checkmark,
+  logOut,
+  logOutOutline,
 } from "ionicons/icons";
+import { Share } from "@capacitor/share";
+import { showToast } from "@/utils";
 import AppLayout from "@/layouts/AppLayout.vue";
 import ModalAkun from "@/components/Akun/ModalAkun.vue";
 import ModalPassword from "@/components/Akun/ModalPassword.vue";
 
 const context = getCurrentInstance();
 const auth = useAuth();
+const ionRouter = useIonRouter();
 
 const profil = async () => {
   const modal = await modalController.create({
@@ -105,27 +124,15 @@ const password = async () => {
   }
 };
 
-const share = async () => {
-  return true;
-};
-
-const showToast = async (msg: string) => {
-  const toast = await toastController.create({
-    animated: true,
-    message: msg,
-    duration: 3000,
-    icon: checkmark,
-    color: "success",
-    cssClass: "tabs-bottom",
-    buttons: [
-      {
-        text: "Ok",
-        role: "cancel",
-        handler: null,
-      },
-    ],
+const share = async () =>
+  await Share.share({
+    text: "Download dan gunakan eAngkot sekarang juga!",
+    url: "https://google.com/",
+    dialogTitle: "Downdload eAngkot",
   });
 
-  return await toast.present();
+const logout = async () => {
+  await auth.logout();
+  ionRouter.navigate("/auth/login", "root", "replace");
 };
 </script>

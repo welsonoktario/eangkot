@@ -1,6 +1,10 @@
 <template>
   <IonPage>
-    <IonHeader :collapse="largeTitle ? 'fade' : null" :translucent="largeTitle">
+    <IonHeader
+      v-if="!fullscreen"
+      :collapse="largeTitle ? 'fade' : null"
+      :translucent="largeTitle"
+    >
       <IonToolbar>
         <slot name="header">
           <IonTitle> {{ title }} </IonTitle>
@@ -38,6 +42,7 @@ import {
 defineProps({
   title: String,
   largeTitle: Boolean,
+  fullscreen: Boolean,
 });
 
 const slots = useSlots();

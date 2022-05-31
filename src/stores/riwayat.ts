@@ -19,7 +19,7 @@ export const useRiwayat = defineStore("riwayat", {
       this._transaksis[index] = transaksi;
     },
     findTransaksi(id: number) {
-      return this._transaksis.find((t: Transaksi) => t.id === id);
+      return this._transaksis.find((t: Transaksi) => t.id === id) as Transaksi;
     },
   },
 });
