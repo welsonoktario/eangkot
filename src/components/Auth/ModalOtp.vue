@@ -35,9 +35,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, defineProps, ref, inject } from "vue";
-import { AxiosStatic } from "axios";
-import AppLayout from "@/layouts/AppLayout.vue";
+import { onMounted } from "vue";
+import { $ref } from "vue/macros";
+import { useAuth } from "@/stores";
 import {
   IonLabel,
   IonTitle,
@@ -47,11 +47,13 @@ import {
   IonIcon,
   modalController,
 } from "@ionic/vue";
-import { arrowBack } from "ionicons/icons";
-import VOtpInput from "vue3-otp-input";
 import { Dialog } from "@capacitor/dialog";
+import { arrowBack } from "ionicons/icons";
+import AppLayout from "@/layouts/AppLayout.vue";
+import VOtpInput from "vue3-otp-input";
 
-const axios: AxiosStatic | undefined = inject("axios");
+const auth = useAuth();
+
 const props = defineProps({
   phone: {
     type: String,
@@ -59,7 +61,7 @@ const props = defineProps({
   },
 });
 
-const pin = ref("");
+const pin = $ref("");
 
 onMounted(() => requestOtp());
 
@@ -69,16 +71,11 @@ const handleOnComplete = (value: string) => {
 
 const closeModal = (data: any) => modalController.dismiss(data);
 
-const requestOtp = async () =>
-  await axios?.post("auth/request-otp", { phone: props.phone });
+const requestOtp = async () => await auth.requestOTP(props.phone);
 
 const checkOtp = async () => {
-  const res = await axios?.post("auth/check-otp", {
-    phone: props.phone,
-    pin: pin.value,
-  });
-
-  const data = await res?.data;
+  const res = await auth.checkOTP(props.phone, pin.value);
+  const data = await res.data;
 
   if (data.msg) {
     await modalController.dismiss(true);

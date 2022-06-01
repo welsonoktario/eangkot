@@ -46,6 +46,7 @@
 </template>
 
 <script lang="ts" setup>
+import { computed, ref, watch } from "vue";
 import {
   IonButton,
   IonButtons,
@@ -61,7 +62,6 @@ import {
   modalController,
 } from "@ionic/vue";
 import { arrowBack, mapOutline } from "ionicons/icons";
-import { computed, defineProps, ref, watch } from "vue";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 const props = defineProps({

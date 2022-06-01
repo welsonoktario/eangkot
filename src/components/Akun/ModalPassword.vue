@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, reactive } from "vue";
+import { reactive } from "vue";
 import { useAuth } from "@/stores";
 import {
   IonButtons,
@@ -67,10 +67,9 @@ import {
 } from "@ionic/vue";
 import { closeOutline, closeCircle } from "ionicons/icons";
 import AppLayout from "@/layouts/AppLayout.vue";
-import { AxiosStatic } from "axios";
+import { showToast } from "@/utils";
 
 const auth = useAuth();
-const axios: AxiosStatic = inject("axios");
 
 const form = reactive({
   passwordLama: "",
@@ -82,10 +81,7 @@ const back = async () => await modalController.dismiss();
 
 const ubahPassword = async () => {
   if (form.password == form.confirmPassword) {
-    const res = await axios.patch(
-      `user/${auth.authUser.id}/ubah-password`,
-      form
-    );
+    const res = await auth.ubahPassword(form);
     const data = await res.data;
 
     if (data.status == "OK") {
@@ -94,12 +90,12 @@ const ubahPassword = async () => {
       await auth.setAuthUser(auth.authUser);
       await modalController.dismiss(true);
     } else if (data.status == "NOT_MATCH") {
-      console.error("pass lama ga cocok", data);
+      await showToast("Password lama tidak cocok", "danger");
     } else {
-      console.error("error", data);
+      await showToast(data.msg, "danger");
     }
   } else {
-    console.warn("password ga sama");
+    await showToast("Password baru tidak cocok", "warning");
   }
 };
 </script>

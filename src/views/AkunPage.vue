@@ -104,7 +104,7 @@ const profil = async () => {
   const success = await (await modal.onDidDismiss()).data;
 
   if (success) {
-    await showToast("Profil berhasil diperbarui");
+    await showToast("Profil berhasil diperbarui", "success");
   }
 };
 
@@ -120,7 +120,7 @@ const password = async () => {
   const success = await (await modal.onDidDismiss()).data;
 
   if (success) {
-    await showToast("Password berhasil diperbarui");
+    await showToast("Password berhasil diperbarui", "success");
   }
 };
 

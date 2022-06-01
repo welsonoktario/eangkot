@@ -1,7 +1,7 @@
 import { User } from "@/models/user";
 import { defineStore } from "pinia";
 import { Storage } from "@capacitor/storage";
-import { http } from "@/utils";
+import { patch, post } from "@/utils/http";
 
 type AuthState = {
   user: User | undefined;
@@ -44,12 +44,28 @@ export const useAuth = defineStore("auth", {
         this.user = JSON.parse(user.value);
         this.token = token.value;
 
-        http.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
-
         return true;
       }
 
       return false;
+    },
+    async login(phone: string) {
+      return await post("auth/login", { phone });
+    },
+    async requestOTP(phone: string) {
+      return await post("auth/request-otp", { phone });
+    },
+    async checkOTP(phone: string, pin: string) {
+      return await post("auth/check-otp", { phone, pin });
+    },
+    async register(nama: string, phone: string) {
+      return await post("auth/register", { nama, phone });
+    },
+    async ubahProfil(data: object) {
+      return await patch(`user/${this.authUser.id}`, data);
+    },
+    async ubahPassword(data: object) {
+      return await patch(`user/${this.authUser.id}/ubah-password`, data);
     },
     async logout() {
       this.user = undefined;

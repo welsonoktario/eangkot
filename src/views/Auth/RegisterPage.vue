@@ -40,7 +40,6 @@
 import { ref, inject } from "vue";
 import { useRoute } from "vue-router";
 import { useAuth } from "@/stores/auth";
-import { AxiosStatic } from "axios";
 import { User } from "@/models/user";
 import {
   IonButton,
@@ -58,13 +57,12 @@ import AppLayout from "@/layouts/AppLayout.vue";
 const route = useRoute();
 const ionRouter = useIonRouter();
 const auth = useAuth();
-const axios: AxiosStatic = inject("axios");
 
 const { phone } = route.params;
 const nama = ref("");
 
 const register = async () => {
-  const res = await axios.post("auth/register", { nama: nama.value, phone });
+  const res = await auth.register(nama.value, phone.toString());
   const data = await res.data;
 
   if (data.status == "OK") {

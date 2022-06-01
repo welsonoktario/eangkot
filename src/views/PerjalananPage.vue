@@ -1,50 +1,49 @@
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
-        </ion-buttons>
-        <ion-title>Perjalanan</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content :fullscreen="true">
-      <ion-grid>
-        <ion-row id="map-wrapper">
-          <ion-col>
+  <AppLayout title="Perjalanan">
+    <template #header>
+      <IonButtons slot="start">
+        <IonBackButton></IonBackButton>
+      </IonButtons>
+      <IonTitle>Perjalanan</IonTitle>
+    </template>
+
+    <template #content>
+      <IonGrid>
+        <IonRow id="map-wrapper">
+          <IonCol>
             <div
               id="map"
               :style="[
                 isLoaded ? { visibility: 'visible' } : { visibility: 'hidden' },
               ]"
             ></div>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <ion-item>
-              <ion-label position="floating">Lokasi Jemput</ion-label>
-              <ion-input
+          </IonCol>
+        </IonRow>
+        <IonRow>
+          <IonCol>
+            <IonItem>
+              <IonLabel position="floating">Lokasi Jemput</IonLabel>
+              <IonInput
                 v-model="destinasi.textJemput"
                 clearInput
                 readonly
                 @click="openModal('Pilih lokasi jemput', 'jemput')"
-              ></ion-input>
-            </ion-item>
-            <ion-item>
-              <ion-label position="floating">Lokasi Tujuan</ion-label>
-              <ion-input
+              ></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Lokasi Tujuan</IonLabel>
+              <IonInput
                 v-model="destinasi.textTujuan"
                 clearInput
                 readonly
                 @click="openModal('Pilih lokasi tujuan', 'tujuan')"
-              ></ion-input>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-content>
-  </ion-page>
+              ></IonInput>
+            </IonItem>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+    </template>
+  </AppLayout>
 </template>
 
 <script lang="ts" setup>
@@ -57,18 +56,15 @@ import {
   IonItem,
   IonLabel,
   IonInput,
-  IonPage,
-  IonHeader,
-  IonToolbar,
   IonTitle,
-  IonContent,
   modalController,
 } from "@ionic/vue";
 import { onMounted, reactive, ref } from "vue";
-import ModalCariAlamat from "@/components/Perjalanan/ModalCariAlamat.vue";
 import { GeolocateControl, Map, Marker, LngLat, LngLatBounds } from "mapbox-gl";
 import { Geolocation } from "@capacitor/geolocation";
 import { Feature, LineString } from "geojson";
+import AppLayout from "@/layouts/AppLayout.vue";
+import ModalCariAlamat from "@/components/Perjalanan/ModalCariAlamat.vue";
 
 let map: Map;
 const accessToken =

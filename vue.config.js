@@ -5,10 +5,7 @@ module.exports = {
       .use('vue-loader')
       .tap(options => ({
         ...options,
-        compilerOptions: {
-          // treat any tag that starts with ion- as custom elements
-          isCustomElement: tag => tag.startsWith('capacitor-')
-        }
+        reactivityTransform: true,
       }))
   }
 }

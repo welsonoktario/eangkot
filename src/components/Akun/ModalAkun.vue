@@ -61,9 +61,8 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, ref } from "vue";
+import { ref } from "vue";
 import { useAuth } from "@/stores";
-import { AxiosStatic } from "axios";
 import {
   IonButtons,
   IonButton,
@@ -79,12 +78,11 @@ import { closeOutline, closeCircle } from "ionicons/icons";
 import AppLayout from "@/layouts/AppLayout.vue";
 
 const auth = useAuth();
-const axios: AxiosStatic = inject("axios");
 
 const akun = ref(auth.authUser);
 
 const ubahProfil = async () => {
-  const res = await axios.patch(`user/${akun.value.id}`, akun.value);
+  const res = await auth.ubahProfil(akun.value);
   const data = await res.data;
 
   if (data.status === "OK") {

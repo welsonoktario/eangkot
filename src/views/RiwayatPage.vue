@@ -54,9 +54,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject, onMounted, computed, getCurrentInstance } from "vue";
+import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
+import { ref, onMounted, computed, getCurrentInstance } from "vue";
 import { useAuth, useRiwayat } from "@/stores";
-import { AxiosStatic } from "axios";
 import {
   IonSpinner,
   IonGrid,
@@ -65,17 +65,15 @@ import {
   IonButton,
   modalController,
 } from "@ionic/vue";
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
+import { showToast } from "@/utils";
 import { Transaksi } from "@/models";
 import AppLayout from "@/layouts/AppLayout.vue";
 import ModalDetailRiwayat from "@/components/Riwayat/ModalDetailRiwayat.vue";
 import CardRiwayat from "@/components/Riwayat/CardRiwayat.vue";
-import { showToast } from "@/utils";
 
 const context = getCurrentInstance();
 const auth = useAuth();
 const riwayat = useRiwayat();
-const axios: AxiosStatic = inject("axios");
 
 const isLoading = ref(true);
 const error = ref({
@@ -95,7 +93,7 @@ const success = computed(
 );
 
 const loadRiwayat = async () => {
-  const res = await axios.get(`transaksi?user_id=${auth.authUser.id}`);
+  const res = await riwayat.loadRiwayat(auth.authUser.id);
   const data = await res.data;
   isLoading.value = !isLoading.value;
 
@@ -112,7 +110,7 @@ const detail = async (transaksi: Transaksi) => {
   const modal = await modalController.create({
     component: ModalDetailRiwayat,
     componentProps: {
-      transaksi,
+      id: transaksi.id,
     },
     canDismiss: true,
     presentingElement: context.parent.refs.ionRouterOutlet as HTMLElement,

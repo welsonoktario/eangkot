@@ -36,8 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, ref } from "vue";
-import { AxiosStatic } from "axios";
+import { ref } from "vue";
 import {
   IonGrid,
   IonRow,
@@ -56,12 +55,24 @@ import AppLayout from "@/layouts/AppLayout.vue";
 import ModalOtp from "@/components/Auth/ModalOtp.vue";
 
 const ionRouter = useIonRouter();
-const axios: AxiosStatic = inject("axios");
 const auth = useAuth();
 const phone = ref("");
 
-const login = async () => {
+/* const loginOld = async () => {
   const res = await axios.post("auth/login", { phone: phone.value });
+  const data = await res.data;
+
+  if (data.msg === "REGISTERED") {
+    await auth.setAuthUser(data.data.user as User, data.data.token);
+
+    ionRouter.push("/tabs/home");
+  } else if (data.msg === "REGISTER") {
+    ionRouter.push(`/auth/register/${phone.value}`);
+  }
+}; */
+
+const login = async () => {
+  const res = await auth.login(phone.value);
   const data = await res.data;
 
   if (data.msg === "REGISTERED") {

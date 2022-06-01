@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, useSlots } from "vue";
+import { useSlots } from "vue";
 import {
   IonPage,
   IonContent,
