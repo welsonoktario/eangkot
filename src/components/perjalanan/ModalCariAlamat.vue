@@ -13,11 +13,22 @@
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
-    <ion-toolbar>
-      <ion-searchbar debounce="500" v-model="query"></ion-searchbar>
+    <ion-toolbar v-if="isPlatform('ios')" class="searchbar">
+      <ion-searchbar
+        ref="searchBar"
+        debounce="500"
+        v-model="query"
+      ></ion-searchbar>
     </ion-toolbar>
   </ion-header>
   <ion-content>
+    <ion-toolbar v-if="isPlatform('android')" class="searchbar">
+      <ion-searchbar
+        ref="searchBar"
+        debounce="500"
+        v-model="query"
+      ></ion-searchbar>
+    </ion-toolbar>
     <ion-list>
       <ion-item v-if="isJemput" detail button @click="closeModal('current')">
         <ion-label>Gunakan lokasi saat ini</ion-label>
@@ -46,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import {
   IonButton,
   IonButtons,
@@ -60,16 +71,25 @@ import {
   IonToolbar,
   IonSearchbar,
   modalController,
+  isPlatform,
 } from "@ionic/vue";
 import { arrowBack, mapOutline } from "ionicons/icons";
+import { get } from "@/utils/http";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 const props = defineProps({
   title: { type: String, default: "Cari Alamat" },
 });
 
+const searchBar = ref(null);
 const query = ref("");
 const results = ref([]);
+
+onMounted(() => {
+  nextTick(() => {
+    setTimeout(async () => await searchBar.value.ionFocus, 150);
+  });
+});
 
 watch(query, async () => cariAlamat());
 
@@ -81,16 +101,27 @@ const cariAlamat = async () => {
   const q = encodeURI(query.value);
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?country=ID&region=ID-JI&access_token=pk.eyJ1Ijoid2Vsc29ub2t0YXJpbyIsImEiOiJja3liam9zNW0wZnppMnVvZGdwaW1tZDltIn0.VZSKrmUqnhui_Z4XQYrvYg`;
 
-  fetch(url)
-    .then((res) => res.json())
-    .then((data) => {
-      results.value = data.features;
-    });
+  const res = await get(url);
+  const data = await res.data;
+  results.value = JSON.parse(data).features;
 };
 </script>
 
 <style scoped>
 .scroller {
   height: 100%;
+}
+
+.md .searchbar {
+  padding-top: 2px;
+  --ion-background-color: transparent !important;
+}
+
+.ios .searchbar {
+  padding-top: 8px;
+}
+
+.ios .searchbar ion-searchbar {
+  padding: 0;
 }
 </style>

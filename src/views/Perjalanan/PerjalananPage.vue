@@ -47,6 +47,7 @@
 </template>
 
 <script lang="ts" setup>
+import { getCurrentInstance } from "vue";
 import {
   IonBackButton,
   IonButtons,
@@ -63,8 +64,11 @@ import { onMounted, reactive, ref } from "vue";
 import { GeolocateControl, Map, Marker, LngLat, LngLatBounds } from "mapbox-gl";
 import { Geolocation } from "@capacitor/geolocation";
 import { Feature, LineString } from "geojson";
+import { post } from "@/utils/http";
 import AppLayout from "@/layouts/AppLayout.vue";
 import ModalCariAlamat from "@/components/Perjalanan/ModalCariAlamat.vue";
+
+const context = getCurrentInstance();
 
 let map: Map;
 const accessToken =
@@ -121,51 +125,53 @@ const getRoute = async () => {
   const jemput = destinasi.jemput.join(",");
   const tujuan = destinasi.tujuan.join(",");
 
-  await fetch(
-    `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      const routes = data.routes[0];
-      const route = routes.geometry.coordinates;
-      const geojson: Feature<LineString> = {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: route,
-        },
-      };
+  const res = await post(
+    `https://api.mapbox.com/directions/v5/mapbox/driving?access_token=${accessToken}`,
+    {
+      coordinates: `${jemput};${tujuan}`,
+      geometries: "geojson",
+    }
+  );
+  const data = await res.data;
+  const routes = data.routes[0];
+  const route = routes.geometry.coordinates;
+  const geojson: Feature<LineString> = {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "LineString",
+      coordinates: route,
+    },
+  };
 
-      map.addLayer({
-        id: "route",
-        type: "line",
-        source: {
-          type: "geojson",
-          data: geojson,
-        },
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#3887be",
-          "line-width": 5,
-          "line-opacity": 0.75,
-        },
-      });
+  map.addLayer({
+    id: "route",
+    type: "line",
+    source: {
+      type: "geojson",
+      data: geojson,
+    },
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
+    paint: {
+      "line-color": "#3887be",
+      "line-width": 5,
+      "line-opacity": 0.75,
+    },
+  });
 
-      const bounds = new LngLatBounds(route[0], route[0]);
+  const bounds = new LngLatBounds(route[0], route[0]);
 
-      // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
-      for (const coord of route) {
-        bounds.extend(coord);
-      }
+  // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
+  for (const coord of route) {
+    bounds.extend(coord);
+  }
 
-      map.fitBounds(bounds, {
-        padding: 20,
-      });
-    });
+  map.fitBounds(bounds, {
+    padding: 20,
+  });
 };
 
 const openModal = async (title: string, type: string) => {
@@ -173,6 +179,8 @@ const openModal = async (title: string, type: string) => {
   const modal = await modalController.create({
     component: ModalCariAlamat,
     componentProps: { title },
+    canDismiss: true,
+    presentingElement: context.parent.refs.ionRouterOutlet as HTMLElement,
   });
 
   modal.present();
@@ -228,7 +236,7 @@ const drawMarker = () => {
 };
 </script>
 
-<style>
+<style scoped>
 #map {
   width: 100%;
   height: 100%;

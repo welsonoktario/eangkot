@@ -7,13 +7,15 @@ const API_URL = process.env.VUE_APP_API_URL;
 export const get = async (endpoint: string) => {
   const isAPI = !endpoint.includes("http") && !endpoint.includes("auth");
   const url = isAPI ? API_URL + endpoint : endpoint;
-  let headers: { Authorization: string };
+  const headers = {
+    Accept: "application/json",
+  };
 
   if (isAPI) {
     const { value } = await Storage.get({ key: "token" });
 
-    headers = Object.assign(
-      {},
+    Object.assign(
+      headers,
       !value && value === "null"
         ? null
         : {

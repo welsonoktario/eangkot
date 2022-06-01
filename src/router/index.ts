@@ -58,7 +58,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/perjalanan",
     name: "perjalanan",
-    component: () => import("@/views/PerjalananPage.vue"),
+    component: () => import("@/views/Perjalanan/PerjalananPage.vue"),
   },
 ];
 
