@@ -21,24 +21,26 @@
         </IonRow>
         <IonRow>
           <IonCol>
-            <IonItem>
-              <IonLabel position="floating">Lokasi Jemput</IonLabel>
-              <IonInput
-                v-model="destinasi.textJemput"
-                clearInput
-                readonly
-                @click="openModal('Pilih lokasi jemput', 'jemput')"
-              ></IonInput>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="floating">Lokasi Tujuan</IonLabel>
-              <IonInput
-                v-model="destinasi.textTujuan"
-                clearInput
-                readonly
-                @click="openModal('Pilih lokasi tujuan', 'tujuan')"
-              ></IonInput>
-            </IonItem>
+            <IonList :inset="true">
+              <IonItem>
+                <IonLabel position="floating">Lokasi Jemput</IonLabel>
+                <IonInput
+                  v-model="destinasi.textJemput"
+                  clearInput
+                  readonly
+                  @click="openModal('Pilih lokasi jemput', 'jemput')"
+                ></IonInput>
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">Lokasi Tujuan</IonLabel>
+                <IonInput
+                  v-model="destinasi.textTujuan"
+                  clearInput
+                  readonly
+                  @click="openModal('Pilih lokasi tujuan', 'tujuan')"
+                ></IonInput>
+              </IonItem>
+            </IonList>
           </IonCol>
         </IonRow>
       </IonGrid>
@@ -54,6 +56,7 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonList,
   IonItem,
   IonLabel,
   IonInput,

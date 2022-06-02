@@ -50,16 +50,16 @@ export const useAuth = defineStore("auth", {
       return false;
     },
     async login(phone: string) {
-      return await post("auth/login", { phone });
+      return await post(`${process.env.VUE_APP_API_URL}auth/login`, { phone });
     },
     async requestOTP(phone: string) {
-      return await post("auth/request-otp", { phone });
+      return await post(`${process.env.VUE_APP_API_URL}auth/request-otp`, { phone });
     },
     async checkOTP(phone: string, pin: string) {
-      return await post("auth/check-otp", { phone, pin });
+      return await post(`${process.env.VUE_APP_API_URL}auth/check-otp`, { phone, pin });
     },
     async register(nama: string, phone: string) {
-      return await post("auth/register", { nama, phone });
+      return await post(`${process.env.VUE_APP_API_URL}auth/register`, { nama, phone });
     },
     async ubahProfil(data: object) {
       return await patch(`user/${this.authUser.id}`, data);

@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject } from "vue";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAuth } from "@/stores/auth";
 import { User } from "@/models/user";
@@ -66,7 +66,7 @@ const register = async () => {
   const data = await res.data;
 
   if (data.status == "OK") {
-    await auth.setAuthUser(data.user as User, data.token);
+    await auth.setAuthUser(data.data.user as User, data.data.token);
     ionRouter.push("/tabs/home");
   }
 };

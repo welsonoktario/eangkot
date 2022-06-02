@@ -61,12 +61,12 @@ const props = defineProps({
   },
 });
 
-const pin = $ref("");
+let pin = $ref("");
 
 onMounted(() => requestOtp());
 
 const handleOnComplete = (value: string) => {
-  pin.value = value;
+  pin = value;
 };
 
 const closeModal = (data: any) => modalController.dismiss(data);
@@ -74,7 +74,7 @@ const closeModal = (data: any) => modalController.dismiss(data);
 const requestOtp = async () => await auth.requestOTP(props.phone);
 
 const checkOtp = async () => {
-  const res = await auth.checkOTP(props.phone, pin.value);
+  const res = await auth.checkOTP(props.phone, pin);
   const data = await res.data;
 
   if (data.msg) {
