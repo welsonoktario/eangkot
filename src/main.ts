@@ -28,12 +28,15 @@ import "@ionic/vue/css/display.css";
 import "./theme/variables.css";
 
 import "mapbox-gl/dist/mapbox-gl.css";
+import { createEcho } from "./utils/pusher";
 
 const app = createApp(App)
   .use(IonicVue)
   .use(router)
   .use(createPinia())
   .use(VueVirtualScroller);
+
+app.provide("pusher", createEcho);
 
 router.isReady().then(() => {
   app.mount("#app");

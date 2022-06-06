@@ -11,6 +11,7 @@
             <h1>
               Halo, <strong>{{ user.nama }}</strong>
             </h1>
+            <p>{{ lokasi }}</p>
           </IonCol>
         </IonRow>
         <IonRow>
@@ -29,21 +30,16 @@
   </AppLayout>
 </template>
 <script lang="ts" setup>
-import { User } from "@/models";
-import { useAuth } from "@/stores";
-import { Storage } from "@capacitor/storage";
-import {
-  IonButton,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonTitle,
-} from "@ionic/vue";
 import { onMounted, ref } from "vue";
+import { useAuth } from "@/stores";
+import { IonButton, IonGrid, IonRow, IonCol, IonTitle } from "@ionic/vue";
+import { Storage } from "@capacitor/storage";
+import { User } from "@/models";
 import AppLayout from "@/layouts/AppLayout.vue";
 
 const auth = useAuth();
 const user = ref<User>(null);
+const lokasi = ref("");
 
 onMounted(async () => await loadUser());
 
