@@ -32,3 +32,6 @@ dump.rdb
 /platforms
 /plugins
 /www
+
+android/app/capacitor.build.gradle
+android/capacitor.settings.gradle

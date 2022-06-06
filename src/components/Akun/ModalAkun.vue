@@ -75,6 +75,7 @@ import {
   modalController,
 } from "@ionic/vue";
 import { closeOutline, closeCircle } from "ionicons/icons";
+import { showToast } from "@/utils";
 import AppLayout from "@/layouts/AppLayout.vue";
 
 const auth = useAuth();
@@ -88,6 +89,8 @@ const ubahProfil = async () => {
   if (data.status === "OK") {
     await auth.setAuthUser(akun.value);
     await modalController.dismiss(true);
+  } else if (data.status === "FAIL") {
+    await showToast(data.msg, "danger");
   }
 };
 

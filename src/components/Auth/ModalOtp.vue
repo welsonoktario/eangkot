@@ -1,20 +1,18 @@
 <template>
-  <app-layout>
+  <AppLayout>
     <template #header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button @click="closeModal(null)">
-            <ion-icon slot="icon-only" :icon="arrowBack"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-        <ion-title>OTP</ion-title>
-      </ion-toolbar>
+      <IonButtons slot="start">
+        <IonButton @click="closeModal(null)">
+          <IonIcon slot="icon-only" :icon="arrowBack"></IonIcon>
+        </IonButton>
+      </IonButtons>
+      <IonTitle>OTP</IonTitle>
     </template>
 
     <template #content>
-      <ion-label>Kode OTP</ion-label>
+      <IonLabel>Kode OTP</IonLabel>
       <div style="display: flex; flex-direction: row; width: 100%">
-        <v-otp-input
+        <VOtpInput
           ref="pin"
           separator="-"
           :num-inputs="4"
@@ -27,11 +25,11 @@
     </template>
 
     <template #footer>
-      <ion-button @click="checkOtp()" class="ion-margin" expand="block">
+      <IonButton @click="checkOtp()" class="ion-margin" expand="block">
         Lanjut
-      </ion-button>
+      </IonButton>
     </template>
-  </app-layout>
+  </AppLayout>
 </template>
 
 <script lang="ts" setup>

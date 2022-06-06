@@ -32,7 +32,14 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/stores";
-import { IonButton, IonGrid, IonRow, IonCol, IonTitle } from "@ionic/vue";
+import {
+  IonButton,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonTitle,
+  loadingController,
+} from "@ionic/vue";
 import { Storage } from "@capacitor/storage";
 import { User } from "@/models";
 import AppLayout from "@/layouts/AppLayout.vue";
@@ -44,11 +51,19 @@ const lokasi = ref("");
 onMounted(async () => await loadUser());
 
 const loadUser = async () => {
+  const loading = await loadingController.create({
+    message: "Mohon tunggu...",
+  });
+
+  await loading.present();
+
   const { value } = await Storage.get({ key: "user" });
   const token = await Storage.get({ key: "token" });
   const userJson = JSON.parse(value);
 
   user.value = userJson;
   auth.setAuthUser(user.value, token.value);
+  
+  await loading.dismiss();
 };
 </script>
