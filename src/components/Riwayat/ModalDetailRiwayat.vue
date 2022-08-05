@@ -15,7 +15,7 @@
     </template>
 
     <template #content>
-      <IonList :inset="true">
+      <IonList inset>
         <IonListHeader>
           <IonLabel>Pengemudi</IonLabel>
         </IonListHeader>
@@ -36,7 +36,7 @@
         </IonListHeader>
         <IonItem>
           <IonIcon slot="start" :md="calendar" :ios="calendarOutline"></IonIcon>
-          <IonLabel>{{ transaksi.tanggal }}</IonLabel>
+          <IonLabel>{{ transaksi.id }}</IonLabel>
         </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="cash" :ios="cashOutline"></IonIcon>
@@ -44,94 +44,106 @@
         </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="time" :ios="timeOutline"></IonIcon>
-          <IonLabel>{{ transaksi.detail.durasi }} detik</IonLabel>
+          <IonLabel>{{ transaksi.durasiPerjalanan }} detik</IonLabel>
         </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="map" :ios="mapOutline"></IonIcon>
-          <IonLabel>{{ transaksi.detail.jarak }} km</IonLabel>
+          <IonLabel>{{ transaksi.jarakPerjalanan }} km</IonLabel>
         </IonItem>
-        <IonListHeader>
-          <IonLabel>Rating dan Komentar</IonLabel>
-        </IonListHeader>
-        <IonItem class="item-input">
-          <IonIcon slot="start" :md="star" :ios="starOutline"></IonIcon>
-          <div class="select-wrapper">
-            <IonLabel>Rating</IonLabel>
-            <IonSelect v-model="ulasan.rating">
-              <IonSelectOption value="1">1</IonSelectOption>
-              <IonSelectOption value="2">2</IonSelectOption>
-              <IonSelectOption value="3">3</IonSelectOption>
-              <IonSelectOption value="4">4</IonSelectOption>
-              <IonSelectOption value="5">5</IonSelectOption>
-            </IonSelect>
-          </div>
-        </IonItem>
-        <IonItem class="ion-margin-bottom item-input">
-          <IonLabel position="stacked">Komentar</IonLabel>
-          <IonTextarea
-            placeholder="Berikan komentar"
-            rows="3"
-            v-model="ulasan.komentar"
-            :readonly="transaksi.ulasan?.komentar"
-          ></IonTextarea>
-        </IonItem>
+        <template v-if="transaksi.ulasan">
+          <IonListHeader>
+            <IonLabel>Rating dan Komentar</IonLabel>
+          </IonListHeader>
+          <IonItem class="item-input">
+            <IonIcon slot="start" :md="star" :ios="starOutline"></IonIcon>
+            <div class="select-wrapper">
+              <IonLabel>Rating</IonLabel>
+              <IonSelect
+                :selectedText="transaksi.ulasan?.rating.toString()"
+                :disabled="true"
+              >
+                <IonSelectOption value="1">1</IonSelectOption>
+                <IonSelectOption value="2">2</IonSelectOption>
+                <IonSelectOption value="3">3</IonSelectOption>
+                <IonSelectOption value="4">4</IonSelectOption>
+                <IonSelectOption value="5">5</IonSelectOption>
+              </IonSelect>
+            </div>
+          </IonItem>
+          <IonItem class="ion-margin-bottom item-input">
+            <IonLabel position="stacked">Komentar</IonLabel>
+            <IonTextarea
+              placeholder="Berikan komentar"
+              :rows="3"
+              :autoGrow="true"
+              :value="transaksi.ulasan?.komentar"
+              :readonly="true"
+            ></IonTextarea>
+          </IonItem>
+        </template>
       </IonList>
+
+      <IonModal
+        v-if="!transaksi.ulasan"
+        :isOpen="isModalRatingOpen"
+        v-on:didDismiss="isModalRatingOpen = false"
+      >
+        <ModalRating :id="id" />
+      </IonModal>
     </template>
 
     <template v-if="!transaksi.ulasan" #footer>
       <IonButton
-        @click="addUlasan()"
+        @click="isModalRatingOpen = true"
         class="ion-margin"
         expand="block"
         fill="solid"
       >
-        Tambah Ulasan
+        Berikan Ulasan
       </IonButton>
     </template>
   </AppLayout>
 </template>
 
 <script lang="ts" setup>
-import { $computed, $ref } from "vue/macros";
+import AppLayout from "@/layouts/AppLayout.vue";
 import { useRiwayat } from "@/stores";
+import { rupiah } from "@/utils";
 import {
-  IonTitle,
-  IonButtons,
   IonButton,
+  IonButtons,
   IonIcon,
+  IonItem,
+  IonLabel,
   IonList,
   IonListHeader,
-  IonLabel,
-  IonItem,
+  IonModal,
   IonSelect,
   IonSelectOption,
   IonTextarea,
+  IonTitle,
   modalController,
 } from "@ionic/vue";
 import {
   calendar,
   calendarOutline,
+  car,
+  carOutline,
   cash,
   cashOutline,
+  closeCircle,
+  closeOutline,
   map,
   mapOutline,
   person,
   personOutline,
-  car,
-  carOutline,
-  time,
-  timeOutline,
-  closeOutline,
-  closeCircle,
   star,
   starOutline,
+  time,
+  timeOutline,
 } from "ionicons/icons";
-import { rupiah, showToast } from "@/utils";
-import AppLayout from "@/layouts/AppLayout.vue";
-import { Ulasan } from "@/models";
-import { onMounted } from "vue";
-
-const riwayat = useRiwayat();
+import { computed, ref } from "vue";
+import ModalRating from "./ModalRating.vue";
 
 const props = defineProps({
   id: {
@@ -140,35 +152,12 @@ const props = defineProps({
   },
 });
 
-const transaksi = $ref(riwayat.findTransaksi(props.id));
-let ulasan = $ref({
-  rating: null,
-  komentar: null,
-} as Ulasan);
-
-onMounted(() => {
-  if (transaksi.ulasan) {
-    ulasan = transaksi.ulasan;
-  }
-});
-
-const ongkos = $computed(() => rupiah(transaksi.ongkos));
+const riwayat = useRiwayat();
+const transaksi = ref(riwayat.findTransaksi(props.id));
+const ongkos = computed(() => rupiah(transaksi.value.ongkos));
+const isModalRatingOpen = ref(false);
 
 const back = async () => await modalController.dismiss();
-
-const addUlasan = async () => {
-  const res = await riwayat.addUlasan(transaksi.id, ulasan);
-  const data = await res.data;
-
-  if (data.status == "OK") {
-    transaksi.ulasan = data.data;
-    riwayat.updateTransaksi(transaksi);
-
-    await modalController.dismiss(true);
-  } else if (data.status == "FAIL") {
-    await showToast(data.msg, "danger");
-  }
-};
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { Transaksi, Ulasan } from "@/models";
 import { get, patch } from "@/utils/http";
 
@@ -22,8 +22,16 @@ export const useRiwayat = defineStore("riwayat", {
     findTransaksi(id: number) {
       return this._transaksis.find((t: Transaksi) => t.id === id) as Transaksi;
     },
-    async loadRiwayat(id: number) {
-      return await get(`transaksi?user_id=${id}`);
+    loadRiwayat() {
+      const error = ref<any | null>(null);
+      const loading = ref<boolean>(true);
+
+      get("transaksi")
+        .then((res) => (this._transaksis = res.data.data))
+        .catch((err) => (error.value = err))
+        .finally(() => (loading.value = false));
+
+      return { error, loading };
     },
     async addUlasan(id: number, ulasan: Ulasan) {
       return await patch(`transaksi/${id}`, ulasan);

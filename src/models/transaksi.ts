@@ -1,10 +1,11 @@
-import { TransaksiDetail, Ulasan } from "@/models";
+import { Pesanan } from "./pesanan";
+import { Ulasan } from "./ulasan";
 
 export interface Transaksi {
   id: number;
-  tanggal: string;
   ongkos: number;
-  detail: TransaksiDetail;
-  pesanan: any;
+  durasiPerjalanan: number;
+  jarakPerjalanan: number;
+  pesanan: Pesanan;
   ulasan?: Ulasan;
 }

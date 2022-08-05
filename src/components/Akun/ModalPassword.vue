@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from "vue";
+import { ref } from "vue";
 import { useAuth } from "@/stores";
 import {
   IonButtons,
@@ -71,7 +71,7 @@ import { showToast } from "@/utils";
 
 const auth = useAuth();
 
-const form = reactive({
+const form = ref({
   passwordLama: "",
   password: "",
   confirmPassword: "",
@@ -80,7 +80,7 @@ const form = reactive({
 const back = async () => await modalController.dismiss();
 
 const ubahPassword = async () => {
-  if (form.password == form.confirmPassword) {
+  if (form.value.password == form.value.confirmPassword) {
     const res = await auth.ubahPassword(form);
     const data = await res.data;
 

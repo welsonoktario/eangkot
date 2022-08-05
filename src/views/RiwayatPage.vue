@@ -1,30 +1,21 @@
 <template>
   <AppLayout title="Riwayat" :largeTitle="true">
     <template #content>
-      <DynamicScroller
-        v-if="success"
-        :items="results"
-        :min-item-size="results.length"
-        class="scroller"
-      >
-        <template v-slot="{ item, index, active }">
-          <DynamicScrollerItem
-            :item="item"
-            :active="active"
-            :size-dependencies="[item.id]"
-            :data-index="index"
-          >
-            <CardRiwayat @click="detail(item)" :transaksi="item" />
-          </DynamicScrollerItem>
-        </template>
-      </DynamicScroller>
+      <IonList v-if="riwayat.transaksis.length" lines="none" class="h-full">
+        <CardRiwayat
+          v-for="item in riwayat.transaksis"
+          @click="detail(item)"
+          :transaksi="item"
+          :key="item.id"
+        />
+      </IonList>
 
-      <div v-else-if="isLoading" class="spin">
+      <div v-else-if="loading" class="spin">
         <ion-spinner></ion-spinner>
       </div>
 
       <IonGrid
-        v-else-if="empty"
+        v-else-if="!riwayat.transaksis.length"
         fixed
         style="height: 100%; display: flex; flex-flow: column"
       >
@@ -39,7 +30,7 @@
       </IonGrid>
 
       <IonGrid
-        v-else-if="error.isError"
+        v-else-if="error"
         fixed
         style="height: 100%; display: flex; flex-flow: column"
       >
@@ -54,10 +45,10 @@
 </template>
 
 <script lang="ts" setup>
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
-import { ref, onMounted, computed, getCurrentInstance } from "vue";
-import { useAuth, useRiwayat } from "@/stores";
+import { getCurrentInstance } from "vue";
+import { useRiwayat } from "@/stores";
 import {
+  IonList,
   IonSpinner,
   IonGrid,
   IonRow,
@@ -65,46 +56,14 @@ import {
   IonButton,
   modalController,
 } from "@ionic/vue";
-import { showToast } from "@/utils";
 import { Transaksi } from "@/models";
 import AppLayout from "@/layouts/AppLayout.vue";
 import ModalDetailRiwayat from "@/components/Riwayat/ModalDetailRiwayat.vue";
 import CardRiwayat from "@/components/Riwayat/CardRiwayat.vue";
 
 const context = getCurrentInstance();
-const auth = useAuth();
 const riwayat = useRiwayat();
-
-const isLoading = ref(true);
-const error = ref({
-  isError: false,
-  msg: "",
-});
-const results = ref<Transaksi[]>([]);
-
-onMounted(async () => await loadRiwayat());
-
-const empty = computed(
-  () => !isLoading.value && !error.value.isError && !results.value.length
-);
-
-const success = computed(
-  () => !isLoading.value && !error.value.isError && results.value.length
-);
-
-const loadRiwayat = async () => {
-  const res = await riwayat.loadRiwayat(auth.authUser.id);
-  const data = await res.data;
-  isLoading.value = !isLoading.value;
-
-  if (data.status === "OK") {
-    results.value = data.data;
-
-    if (results.value.length) {
-      riwayat.setTransaksis(results.value);
-    }
-  }
-};
+const { error, loading } = riwayat.loadRiwayat();
 
 const detail = async (transaksi: Transaksi) => {
   const modal = await modalController.create({
@@ -117,27 +76,11 @@ const detail = async (transaksi: Transaksi) => {
   });
 
   await modal.present();
-
-  const success = await (await modal.onDidDismiss()).data;
-
-  if (success) {
-    showToast("Ulasan berhasil ditambahkan", "success");
-  }
 };
 </script>
 
 <style scoped>
-.spin {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-ion-spinner {
-  width: 28px;
-  height: 28px;
-  stroke: #444;
-  fill: #222;
+.h-full {
+  height: 100%;
 }
 </style>

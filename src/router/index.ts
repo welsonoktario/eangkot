@@ -41,6 +41,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "",
+        name: "auth.redirect",
         redirect: "/auth/login",
       },
       {

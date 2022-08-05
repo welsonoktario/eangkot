@@ -14,33 +14,29 @@
       </ion-buttons>
     </ion-toolbar>
     <ion-toolbar>
-      <ion-searchbar debounce="500" v-model="query"></ion-searchbar>
+      <ion-searchbar :debounce="500" v-model="query"></ion-searchbar>
     </ion-toolbar>
   </ion-header>
   <ion-content>
     <ion-list>
-      <ion-item v-if="isJemput" detail button @click="closeModal('current')">
+      <ion-item
+        v-if="isJemput"
+        detail
+        button
+        @click="closeModal('current')"
+        lines="inset"
+      >
         <ion-label>Gunakan lokasi saat ini</ion-label>
       </ion-item>
-      <DynamicScroller
-        v-if="results.length"
-        :items="results"
-        :min-item-size="results.length"
-        class="scroller"
+      <ion-item
+        v-for="item in results"
+        detail
+        button
+        @click="closeModal(item)"
+        :key="item.id"
       >
-        <template v-slot="{ item, index, active }">
-          <DynamicScrollerItem
-            :item="item"
-            :active="active"
-            :size-dependencies="[item.place_name]"
-            :data-index="index"
-          >
-            <ion-item detail button @click="closeModal(item)">
-              <ion-label>{{ item.place_name }}</ion-label>
-            </ion-item>
-          </DynamicScrollerItem>
-        </template>
-      </DynamicScroller>
+        <ion-label>{{ item.place_name }}</ion-label>
+      </ion-item>
     </ion-list>
   </ion-content>
 </template>
@@ -62,7 +58,6 @@ import {
   modalController,
 } from "@ionic/vue";
 import { arrowBack, mapOutline } from "ionicons/icons";
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 const props = defineProps({
   title: { type: String, default: "Cari Alamat" },
@@ -90,7 +85,7 @@ const cariAlamat = async () => {
 </script>
 
 <style scoped>
-.scroller {
-  height: 100%;
+ion-toolbar.md {
+  --ion-background-color: #121212;
 }
 </style>

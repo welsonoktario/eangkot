@@ -31,7 +31,7 @@
 <script lang="ts" setup>
 import { User } from "@/models";
 import { useAuth } from "@/stores";
-import { Storage } from "@capacitor/storage";
+import { Preferences } from "@capacitor/preferences";
 import {
   IonButton,
   IonGrid,
@@ -48,8 +48,8 @@ const user = ref<User>(null);
 onMounted(async () => await loadUser());
 
 const loadUser = async () => {
-  const { value } = await Storage.get({ key: "user" });
-  const token = await Storage.get({ key: "token" });
+  const { value } = await Preferences.get({ key: "user" });
+  const token = await Preferences.get({ key: "token" });
   const userJson = JSON.parse(value);
 
   user.value = userJson;

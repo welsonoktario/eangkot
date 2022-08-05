@@ -1,16 +1,16 @@
 import { Http, HttpOptions } from "@capacitor-community/http";
-import { Storage } from "@capacitor/storage";
+import { Preferences } from "@capacitor/preferences";
 import { keysToCamel, keysToSnake } from "./bodySerializer";
 
 const API_URL = process.env.VUE_APP_API_URL;
 
 export const get = async (endpoint: string) => {
-  const isAPI = !endpoint.includes("http") && !endpoint.includes("auth");
+  const isAPI = !endpoint.includes("http");
   const url = isAPI ? API_URL + endpoint : endpoint;
   let headers: { Authorization: string };
 
   if (isAPI) {
-    const { value } = await Storage.get({ key: "token" });
+    const { value } = await Preferences.get({ key: "token" });
 
     headers = Object.assign(
       {},
@@ -34,7 +34,7 @@ export const get = async (endpoint: string) => {
 };
 
 export const post = async (endpoint: string, payload: object) => {
-  const isAPI = !endpoint.includes("http") && !endpoint.includes("auth");
+  const isAPI = !endpoint.includes("http");
   const url = isAPI ? API_URL + endpoint : endpoint;
   const data = keysToSnake(payload);
   const headers = {
@@ -42,7 +42,7 @@ export const post = async (endpoint: string, payload: object) => {
   };
 
   if (isAPI) {
-    const { value } = await Storage.get({ key: "token" });
+    const { value } = await Preferences.get({ key: "token" });
 
     Object.assign(
       headers,
@@ -67,7 +67,7 @@ export const post = async (endpoint: string, payload: object) => {
 };
 
 export const patch = async (endpoint: string, payload: object) => {
-  const isAPI = !endpoint.includes("http") && !endpoint.includes("auth");
+  const isAPI = !endpoint.includes("http");
   const url = isAPI ? API_URL + endpoint : endpoint;
   const data = keysToSnake(payload);
   const headers = {
@@ -75,7 +75,7 @@ export const patch = async (endpoint: string, payload: object) => {
   };
 
   if (isAPI) {
-    const { value } = await Storage.get({ key: "token" });
+    const { value } = await Preferences.get({ key: "token" });
 
     Object.assign(
       headers,

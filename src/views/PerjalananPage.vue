@@ -59,7 +59,7 @@ import {
   IonTitle,
   modalController,
 } from "@ionic/vue";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { GeolocateControl, Map, Marker, LngLat, LngLatBounds } from "mapbox-gl";
 import { Geolocation } from "@capacitor/geolocation";
 import { Feature, LineString } from "geojson";
@@ -73,7 +73,7 @@ const isLoaded = ref(false);
 const isDark =
   window.matchMedia &&
   window.matchMedia("(prefers-color-scheme: dark)").matches;
-const destinasi = reactive({
+const destinasi = ref({
   jemput: [],
   markerJemput: undefined,
   textJemput: "",
@@ -118,8 +118,8 @@ onMounted(async () => {
 });
 
 const getRoute = async () => {
-  const jemput = destinasi.jemput.join(",");
-  const tujuan = destinasi.tujuan.join(",");
+  const jemput = destinasi.value.jemput.join(",");
+  const tujuan = destinasi.value.tujuan.join(",");
 
   await fetch(
     `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
@@ -183,14 +183,14 @@ const openModal = async (title: string, type: string) => {
     if (data === "current") {
       await getCurrentLocation();
       drawMarker();
-      destinasi.textJemput = "Lokasi saat ini";
+      destinasi.value.textJemput = "Lokasi saat ini";
     } else if (typeof data === "object") {
       if (cariType.value == "jemput") {
-        destinasi.jemput = data.geometry.coordinates;
-        destinasi.textJemput = data.place_name;
+        destinasi.value.jemput = data.geometry.coordinates;
+        destinasi.value.textJemput = data.place_name;
       } else {
-        destinasi.tujuan = data.geometry.coordinates;
-        destinasi.textTujuan = data.place_name;
+        destinasi.value.tujuan = data.geometry.coordinates;
+        destinasi.value.textTujuan = data.place_name;
       }
       drawMarker();
     }
@@ -200,29 +200,29 @@ const openModal = async (title: string, type: string) => {
 const getCurrentLocation = async () => {
   const { coords } = await Geolocation.getCurrentPosition();
 
-  destinasi.jemput = [coords.longitude, coords.latitude];
+  destinasi.value.jemput = [coords.longitude, coords.latitude];
 };
 
 const drawMarker = () => {
   if (cariType.value == "jemput") {
-    destinasi.markerJemput = new Marker()
-      .setLngLat(new LngLat(destinasi.jemput[0], destinasi.jemput[1]))
+    destinasi.value.markerJemput = new Marker()
+      .setLngLat(new LngLat(destinasi.value.jemput[0], destinasi.value.jemput[1]))
       .addTo(map);
 
     map.flyTo({
-      center: destinasi.markerJemput.getLngLat(),
+      center: destinasi.value.markerJemput.getLngLat(),
     });
   } else {
-    destinasi.markerTujuan = new Marker()
-      .setLngLat(new LngLat(destinasi.tujuan[0], destinasi.tujuan[1]))
+    destinasi.value.markerTujuan = new Marker()
+      .setLngLat(new LngLat(destinasi.value.tujuan[0], destinasi.value.tujuan[1]))
       .addTo(map);
 
     map.flyTo({
-      center: destinasi.markerTujuan.getLngLat(),
+      center: destinasi.value.markerTujuan.getLngLat(),
     });
   }
 
-  if (destinasi.markerJemput && destinasi.markerTujuan) {
+  if (destinasi.value.markerJemput && destinasi.value.markerTujuan) {
     getRoute();
   }
 };

@@ -237,12 +237,29 @@ http://ionicframework.com/docs/theming/ */
 .md .tabs-bottom {
   transform: translateY(-56px) !important;
 }
+
 .ios .tabs-bottom {
   transform: translateY(-60px) !important;
 }
+
 .md .header-top {
   top: 56px !important;
 }
+
 .ios .header-top {
   top: 44px !important;
+}
+
+.spin {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+ion-spinner {
+  width: 28px;
+  height: 28px;
+  stroke: #444;
+  fill: #222;
 }
