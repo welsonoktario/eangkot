@@ -36,23 +36,23 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import ModalOtp from "@/components/Auth/ModalOtp.vue";
+import AppLayout from "@/layouts/AppLayout.vue";
+import { User } from "@/types/user";
+import { useAuth } from "@/stores/auth";
 import {
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonList,
   IonButton,
+  IonCol,
+  IonGrid,
+  IonInput,
   IonItem,
   IonLabel,
-  IonInput,
+  IonList,
+  IonRow,
   modalController,
   useIonRouter,
 } from "@ionic/vue";
-import { useAuth } from "@/stores/auth";
-import { User } from "@/models/user";
-import AppLayout from "@/layouts/AppLayout.vue";
-import ModalOtp from "@/components/Auth/ModalOtp.vue";
+import { ref } from "vue";
 
 const ionRouter = useIonRouter();
 const auth = useAuth();

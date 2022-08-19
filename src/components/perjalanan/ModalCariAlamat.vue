@@ -42,22 +42,22 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
 import {
   IonButton,
   IonButtons,
+  IonContent,
+  IonHeader,
   IonIcon,
   IonItem,
   IonLabel,
   IonList,
-  IonContent,
-  IonHeader,
+  IonSearchbar,
   IonTitle,
   IonToolbar,
-  IonSearchbar,
   modalController,
 } from "@ionic/vue";
 import { arrowBack, mapOutline } from "ionicons/icons";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   title: { type: String, default: "Cari Alamat" },

@@ -58,35 +58,35 @@
 </template>
 
 <script lang="ts" setup>
-import { getCurrentInstance } from "vue";
+import ModalAkun from "@/components/Akun/ModalAkun.vue";
+import ModalPassword from "@/components/Akun/ModalPassword.vue";
+import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuth } from "@/stores";
+import { showToast } from "@/utils";
+import { Share } from "@capacitor/share";
 import {
-  IonList,
+  IonIcon,
   IonItem,
   IonLabel,
-  IonIcon,
+  IonList,
   modalController,
   useIonRouter,
 } from "@ionic/vue";
 import {
-  time,
-  timeOutline,
-  person,
-  personOutline,
-  key,
-  keyOutline,
-  people,
-  peopleOutline,
   help,
   helpCircleOutline,
+  key,
+  keyOutline,
   logOut,
   logOutOutline,
+  people,
+  peopleOutline,
+  person,
+  personOutline,
+  time,
+  timeOutline,
 } from "ionicons/icons";
-import { Share } from "@capacitor/share";
-import { showToast } from "@/utils";
-import AppLayout from "@/layouts/AppLayout.vue";
-import ModalAkun from "@/components/Akun/ModalAkun.vue";
-import ModalPassword from "@/components/Akun/ModalPassword.vue";
+import { getCurrentInstance } from "vue";
 
 const context = getCurrentInstance();
 const auth = useAuth();

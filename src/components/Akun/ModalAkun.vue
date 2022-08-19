@@ -61,21 +61,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuth } from "@/stores";
 import {
-  IonButtons,
   IonButton,
+  IonButtons,
   IonIcon,
-  IonTitle,
-  IonList,
+  IonInput,
   IonItem,
   IonLabel,
-  IonInput,
+  IonList,
+  IonTitle,
   modalController,
 } from "@ionic/vue";
-import { closeOutline, closeCircle } from "ionicons/icons";
-import AppLayout from "@/layouts/AppLayout.vue";
+import { closeCircle, closeOutline } from "ionicons/icons";
+import { ref } from "vue";
 
 const auth = useAuth();
 

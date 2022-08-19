@@ -29,15 +29,15 @@
 </template>
 
 <script lang="ts" setup>
-import { useSlots } from "vue";
 import {
-  IonPage,
   IonContent,
-  IonHeader,
   IonFooter,
-  IonToolbar,
+  IonHeader,
+  IonPage,
   IonTitle,
+  IonToolbar,
 } from "@ionic/vue";
+import { useSlots } from "vue";
 
 defineProps({
   title: String,

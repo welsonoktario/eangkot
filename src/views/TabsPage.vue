@@ -24,20 +24,20 @@
 
 <script lang="ts" setup>
 import {
+  IonIcon,
+  IonLabel,
+  IonPage,
+  IonRouterOutlet,
   IonTabBar,
   IonTabButton,
   IonTabs,
-  IonLabel,
-  IonIcon,
-  IonPage,
-  IonRouterOutlet,
 } from "@ionic/vue";
 import {
   home,
   homeOutline,
-  time,
-  timeOutline,
   person,
   personOutline,
+  time,
+  timeOutline,
 } from "ionicons/icons";
 </script>

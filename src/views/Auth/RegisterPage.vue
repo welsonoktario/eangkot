@@ -37,22 +37,22 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject } from "vue";
-import { useRoute } from "vue-router";
+import AppLayout from "@/layouts/AppLayout.vue";
+import { User } from "@/types/user";
 import { useAuth } from "@/stores/auth";
-import { User } from "@/models/user";
 import {
+  IonBackButton,
   IonButton,
   IonButtons,
-  IonBackButton,
-  IonTitle,
-  IonList,
+  IonInput,
   IonItem,
   IonLabel,
-  IonInput,
+  IonList,
+  IonTitle,
   useIonRouter,
 } from "@ionic/vue";
-import AppLayout from "@/layouts/AppLayout.vue";
+import { ref } from "vue";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 const ionRouter = useIonRouter();

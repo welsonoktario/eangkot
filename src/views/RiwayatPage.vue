@@ -1,11 +1,11 @@
 <template>
   <AppLayout title="Riwayat" :largeTitle="true">
     <template #content>
-      <IonList v-if="riwayat.transaksis.length" lines="none" class="h-full">
+      <IonList v-if="riwayat.pesanans.length" lines="none" class="h-full">
         <CardRiwayat
-          v-for="item in riwayat.transaksis"
-          @click="detail(item)"
-          :transaksi="item"
+          v-for="item in riwayat.pesanans"
+          @click="detail(item.id)"
+          :transaksi="item.transaksi"
           :key="item.id"
         />
       </IonList>
@@ -15,7 +15,7 @@
       </div>
 
       <IonGrid
-        v-else-if="!riwayat.transaksis.length"
+        v-else-if="!riwayat.pesanans.length"
         fixed
         style="height: 100%; display: flex; flex-flow: column"
       >
@@ -45,31 +45,30 @@
 </template>
 
 <script lang="ts" setup>
-import { getCurrentInstance } from "vue";
+import CardRiwayat from "@/components/Riwayat/CardRiwayat.vue";
+import ModalDetailRiwayat from "@/components/Riwayat/ModalDetailRiwayat.vue";
+import AppLayout from "@/layouts/AppLayout.vue";
 import { useRiwayat } from "@/stores";
 import {
-  IonList,
-  IonSpinner,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonButton,
+  IonCol,
+  IonGrid,
+  IonList,
+  IonRow,
+  IonSpinner,
   modalController,
 } from "@ionic/vue";
-import { Transaksi } from "@/models";
-import AppLayout from "@/layouts/AppLayout.vue";
-import ModalDetailRiwayat from "@/components/Riwayat/ModalDetailRiwayat.vue";
-import CardRiwayat from "@/components/Riwayat/CardRiwayat.vue";
+import { getCurrentInstance } from "vue";
 
 const context = getCurrentInstance();
 const riwayat = useRiwayat();
 const { error, loading } = riwayat.loadRiwayat();
 
-const detail = async (transaksi: Transaksi) => {
+const detail = async (id: number) => {
   const modal = await modalController.create({
     component: ModalDetailRiwayat,
     componentProps: {
-      id: transaksi.id,
+      id,
     },
     canDismiss: true,
     presentingElement: context.parent.refs.ionRouterOutlet as HTMLElement,

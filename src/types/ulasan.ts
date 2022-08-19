@@ -1,5 +1,5 @@
 export interface Ulasan {
   id: number;
-  rating: number;
-  komentar: string;
+  rating?: number;
+  komentar?: string;
 }

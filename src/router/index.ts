@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory } from "@ionic/vue-router";
-import { RouteRecordRaw } from "vue-router";
 import { useAuth } from "@/stores";
 import AuthPage from "@/views/Auth/AuthPage.vue";
 import TabsPage from "@/views/TabsPage.vue";
+import { createRouter, createWebHistory } from "@ionic/vue-router";
+import { RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {

@@ -1,6 +1,6 @@
 import { Http, HttpOptions } from "@capacitor-community/http";
 import { Preferences } from "@capacitor/preferences";
-import { keysToCamel, keysToSnake } from "./bodySerializer";
+import { keysToSnake } from "./bodySerializer";
 
 const API_URL = process.env.VUE_APP_API_URL;
 
@@ -27,10 +27,7 @@ export const get = async (endpoint: string) => {
     headers,
   };
 
-  const res = await Http.get(options);
-  res.data = keysToCamel(res.data);
-
-  return res;
+  return await Http.get(options);
 };
 
 export const post = async (endpoint: string, payload: object) => {
@@ -60,10 +57,7 @@ export const post = async (endpoint: string, payload: object) => {
     headers,
   };
 
-  const res = await Http.post(options);
-  res.data = keysToCamel(res.data);
-
-  return res;
+  return await Http.post(options);
 };
 
 export const patch = async (endpoint: string, payload: object) => {
@@ -93,8 +87,5 @@ export const patch = async (endpoint: string, payload: object) => {
     headers,
   };
 
-  const res = await Http.patch(options);
-  res.data = keysToCamel(res.data);
-
-  return res;
+  return await Http.patch(options);
 };

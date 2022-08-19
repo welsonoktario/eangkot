@@ -1,7 +1,7 @@
-import { User } from "@/models/user";
-import { defineStore } from "pinia";
-import { Preferences } from "@capacitor/preferences";
+import { User } from "@/types/user";
 import { patch, post } from "@/utils/http";
+import { Preferences } from "@capacitor/preferences";
+import { defineStore } from "pinia";
 
 type AuthState = {
   user: User | undefined;

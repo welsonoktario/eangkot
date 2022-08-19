@@ -35,21 +35,21 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
-import { $ref } from "vue/macros";
+import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuth } from "@/stores";
+import { Dialog } from "@capacitor/dialog";
 import {
+  IonButton,
+  IonButtons,
+  IonIcon,
   IonLabel,
   IonTitle,
   IonToolbar,
-  IonButtons,
-  IonButton,
-  IonIcon,
   modalController,
 } from "@ionic/vue";
-import { Dialog } from "@capacitor/dialog";
 import { arrowBack } from "ionicons/icons";
-import AppLayout from "@/layouts/AppLayout.vue";
+import { onMounted } from "vue";
+import { $ref } from "vue/macros";
 import VOtpInput from "vue3-otp-input";
 
 const auth = useAuth();

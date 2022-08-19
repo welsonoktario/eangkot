@@ -47,24 +47,24 @@
 </template>
 
 <script lang="ts" setup>
+import ModalCariAlamat from "@/components/Perjalanan/ModalCariAlamat.vue";
+import AppLayout from "@/layouts/AppLayout.vue";
+import { Geolocation } from "@capacitor/geolocation";
 import {
   IonBackButton,
   IonButtons,
-  IonGrid,
-  IonRow,
   IonCol,
+  IonGrid,
+  IonInput,
   IonItem,
   IonLabel,
-  IonInput,
+  IonRow,
   IonTitle,
   modalController,
 } from "@ionic/vue";
-import { onMounted, ref } from "vue";
-import { GeolocateControl, Map, Marker, LngLat, LngLatBounds } from "mapbox-gl";
-import { Geolocation } from "@capacitor/geolocation";
 import { Feature, LineString } from "geojson";
-import AppLayout from "@/layouts/AppLayout.vue";
-import ModalCariAlamat from "@/components/Perjalanan/ModalCariAlamat.vue";
+import { GeolocateControl, LngLat, LngLatBounds, Map, Marker } from "mapbox-gl";
+import { onMounted, ref } from "vue";
 
 let map: Map;
 const accessToken =
@@ -206,7 +206,9 @@ const getCurrentLocation = async () => {
 const drawMarker = () => {
   if (cariType.value == "jemput") {
     destinasi.value.markerJemput = new Marker()
-      .setLngLat(new LngLat(destinasi.value.jemput[0], destinasi.value.jemput[1]))
+      .setLngLat(
+        new LngLat(destinasi.value.jemput[0], destinasi.value.jemput[1])
+      )
       .addTo(map);
 
     map.flyTo({
@@ -214,7 +216,9 @@ const drawMarker = () => {
     });
   } else {
     destinasi.value.markerTujuan = new Marker()
-      .setLngLat(new LngLat(destinasi.value.tujuan[0], destinasi.value.tujuan[1]))
+      .setLngLat(
+        new LngLat(destinasi.value.tujuan[0], destinasi.value.tujuan[1])
+      )
       .addTo(map);
 
     map.flyTo({
@@ -228,7 +232,23 @@ const drawMarker = () => {
 };
 </script>
 
-<style>
+<style scoped>
+ion-content {
+  --offset-bottom: auto !important;
+  --overflow: auto;
+  --background: #f7f7fa;
+  overflow: auto;
+}
+
+ion-content::part(background) {
+  bottom: 0;
+}
+
+ion-content::-webkit-scrollbar {
+  display: none;
+  scrollbar-width: none;
+}
+
 #map {
   width: 100%;
   height: 100%;

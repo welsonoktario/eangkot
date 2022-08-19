@@ -29,18 +29,12 @@
   </AppLayout>
 </template>
 <script lang="ts" setup>
-import { User } from "@/models";
-import { useAuth } from "@/stores";
-import { Preferences } from "@capacitor/preferences";
-import {
-  IonButton,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonTitle,
-} from "@ionic/vue";
-import { onMounted, ref } from "vue";
 import AppLayout from "@/layouts/AppLayout.vue";
+import { useAuth } from "@/stores";
+import { User } from "@/types";
+import { Preferences } from "@capacitor/preferences";
+import { IonButton, IonCol, IonGrid, IonRow, IonTitle } from "@ionic/vue";
+import { onMounted, ref } from "vue";
 
 const auth = useAuth();
 const user = ref<User>(null);

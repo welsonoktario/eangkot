@@ -1,4 +1,3 @@
-import { Pesanan } from "./pesanan";
 import { Ulasan } from "./ulasan";
 
 export interface Transaksi {
@@ -6,6 +5,6 @@ export interface Transaksi {
   ongkos: number;
   durasiPerjalanan: number;
   jarakPerjalanan: number;
-  pesanan: Pesanan;
+  tanggal: string;
   ulasan?: Ulasan;
 }

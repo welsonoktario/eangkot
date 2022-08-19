@@ -10,9 +10,9 @@
 <script lang="ts" setup>
 import {
   IonCard,
+  IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  IonCardContent,
 } from "@ionic/vue";
 
 defineProps({

@@ -17,26 +17,30 @@
     <template #content>
       <IonList inset>
         <IonListHeader>
-          <IonLabel>Pengemudi</IonLabel>
+          <IonLabel>Detail Pesanan</IonLabel>
         </IonListHeader>
+        <IonItem>
+          <IonIcon slot="start" :md="calendar" :ios="calendarOutline"></IonIcon>
+          <IonLabel>{{ pesanan.tanggal }}</IonLabel>
+        </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="person" :ios="personOutline"></IonIcon>
           <IonLabel
-            >{{ transaksi.pesanan.driver.user.nama }},
-            {{ transaksi.pesanan.driver.angkot.noKendaraan }}</IonLabel
+            >{{ pesanan.driver.user.nama }},
+            {{ pesanan.driver.angkot.noKendaraan }}</IonLabel
           >
         </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="car" :ios="carOutline"></IonIcon>
-          <IonLabel>{{ transaksi.pesanan.driver.angkot.trayek.kode }}</IonLabel>
+          <IonLabel>{{ pesanan.driver.angkot.trayek.kode }}</IonLabel>
         </IonItem>
 
         <IonListHeader>
-          <IonLabel>Detail Perjalanan</IonLabel>
+          <IonLabel>Detail Transaksi</IonLabel>
         </IonListHeader>
         <IonItem>
           <IonIcon slot="start" :md="calendar" :ios="calendarOutline"></IonIcon>
-          <IonLabel>{{ transaksi.id }}</IonLabel>
+          <IonLabel>{{ pesanan.transaksi.tanggal }}</IonLabel>
         </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="cash" :ios="cashOutline"></IonIcon>
@@ -44,13 +48,13 @@
         </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="time" :ios="timeOutline"></IonIcon>
-          <IonLabel>{{ transaksi.durasiPerjalanan }} detik</IonLabel>
+          <IonLabel>{{ durasi }}</IonLabel>
         </IonItem>
         <IonItem>
           <IonIcon slot="start" :md="map" :ios="mapOutline"></IonIcon>
-          <IonLabel>{{ transaksi.jarakPerjalanan }} km</IonLabel>
+          <IonLabel>{{ pesanan.transaksi.jarakPerjalanan }} km</IonLabel>
         </IonItem>
-        <template v-if="transaksi.ulasan">
+        <template v-if="pesanan.transaksi.ulasan">
           <IonListHeader>
             <IonLabel>Rating dan Komentar</IonLabel>
           </IonListHeader>
@@ -59,7 +63,7 @@
             <div class="select-wrapper">
               <IonLabel>Rating</IonLabel>
               <IonSelect
-                :selectedText="transaksi.ulasan?.rating.toString()"
+                :selectedText="pesanan.transaksi.ulasan?.rating.toString()"
                 :disabled="true"
               >
                 <IonSelectOption value="1">1</IonSelectOption>
@@ -76,7 +80,7 @@
               placeholder="Berikan komentar"
               :rows="3"
               :autoGrow="true"
-              :value="transaksi.ulasan?.komentar"
+              :value="pesanan.transaksi.ulasan?.komentar"
               :readonly="true"
             ></IonTextarea>
           </IonItem>
@@ -84,7 +88,7 @@
       </IonList>
 
       <IonModal
-        v-if="!transaksi.ulasan"
+        v-if="!pesanan.transaksi.ulasan"
         :isOpen="isModalRatingOpen"
         v-on:didDismiss="isModalRatingOpen = false"
       >
@@ -92,7 +96,7 @@
       </IonModal>
     </template>
 
-    <template v-if="!transaksi.ulasan" #footer>
+    <template v-if="!pesanan.transaksi.ulasan" #footer>
       <IonButton
         @click="isModalRatingOpen = true"
         class="ion-margin"
@@ -153,8 +157,20 @@ const props = defineProps({
 });
 
 const riwayat = useRiwayat();
-const transaksi = ref(riwayat.findTransaksi(props.id));
-const ongkos = computed(() => rupiah(transaksi.value.ongkos));
+const pesanan = ref(riwayat.findPesanan(props.id));
+const ongkos = computed(() => rupiah(pesanan.value.transaksi.ongkos));
+const durasi = computed(() => {
+  const d = pesanan.value.transaksi.durasiPerjalanan;
+  const h = Math.floor(d / 3600);
+  const m = Math.floor((d % 3600) / 60);
+  const s = Math.floor((d % 3600) % 60);
+
+  const hDisplay = h > 0 ? h + " jam " : "";
+  const mDisplay = m > 0 ? m + " menit " : "";
+  const sDisplay = s > 0 ? s + " detik" : "";
+
+  return hDisplay + mDisplay + sDisplay;
+});
 const isModalRatingOpen = ref(false);
 
 const back = async () => await modalController.dismiss();
