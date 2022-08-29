@@ -13,11 +13,22 @@
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
-    <ion-toolbar>
-      <ion-searchbar :debounce="500" v-model="query"></ion-searchbar>
+    <ion-toolbar v-if="isPlatform('ios')" class="searchbar">
+      <ion-searchbar
+        ref="searchBar"
+        :debounce="500"
+        v-model="query"
+      ></ion-searchbar>
     </ion-toolbar>
   </ion-header>
   <ion-content>
+    <ion-toolbar v-if="isPlatform('android')" class="searchbar">
+      <ion-searchbar
+        ref="searchBar"
+        :debounce="500"
+        v-model="query"
+      ></ion-searchbar>
+    </ion-toolbar>
     <ion-list>
       <ion-item
         v-if="isJemput"
@@ -54,17 +65,25 @@ import {
   IonSearchbar,
   IonTitle,
   IonToolbar,
+  isPlatform,
   modalController,
 } from "@ionic/vue";
 import { arrowBack, mapOutline } from "ionicons/icons";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
   title: { type: String, default: "Cari Alamat" },
 });
 
+const searchBar = ref(null);
 const query = ref("");
 const results = ref([]);
+
+onMounted(() => {
+  nextTick(() => {
+    setTimeout(async () => await searchBar.value.ionFocus, 150);
+  });
+});
 
 watch(query, async () => cariAlamat());
 
@@ -87,5 +106,16 @@ const cariAlamat = async () => {
 <style scoped>
 ion-toolbar.md {
   --ion-background-color: #121212;
+}
+
+.md .searchbar {
+  padding-top: 2px;
+  --ion-background-color: transparent !important;
+}
+.ios .searchbar {
+  padding-top: 8px;
+}
+.ios .searchbar ion-searchbar {
+  padding: 0;
 }
 </style>

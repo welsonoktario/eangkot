@@ -48,8 +48,7 @@ import {
   modalController,
 } from "@ionic/vue";
 import { arrowBack } from "ionicons/icons";
-import { onMounted } from "vue";
-import { $ref } from "vue/macros";
+import { onMounted, ref } from "vue";
 import VOtpInput from "vue3-otp-input";
 
 const auth = useAuth();
@@ -61,7 +60,7 @@ const props = defineProps({
   },
 });
 
-const pin = $ref("");
+const pin = ref("");
 
 onMounted(() => requestOtp());
 

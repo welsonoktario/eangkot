@@ -4,6 +4,7 @@ import App from "./App.vue";
 import router from "./router";
 
 import { IonicVue } from "@ionic/vue";
+import { createEcho } from "./utils/pusher";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/vue/css/core.css";
@@ -26,7 +27,11 @@ import "./theme/variables.css";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const app = createApp(App).use(IonicVue).use(router).use(createPinia());
+const app = createApp(App)
+  .use(IonicVue)
+  .use(router)
+  .use(createPinia())
+  .provide("pusher", createEcho);
 
 router.isReady().then(() => {
   app.mount("#app");

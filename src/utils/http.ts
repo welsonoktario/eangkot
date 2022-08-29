@@ -32,13 +32,14 @@ export const get = async (endpoint: string) => {
 
 export const post = async (endpoint: string, payload: object) => {
   const isAPI = !endpoint.includes("http");
+  const isChannel = endpoint.includes("broadcasting");
   const url = isAPI ? API_URL + endpoint : endpoint;
   const data = keysToSnake(payload);
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
-  if (isAPI) {
+  if (isAPI || isChannel) {
     const { value } = await Preferences.get({ key: "token" });
 
     Object.assign(

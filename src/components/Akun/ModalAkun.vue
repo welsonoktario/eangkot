@@ -63,6 +63,7 @@
 <script lang="ts" setup>
 import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuth } from "@/stores";
+import { showToast } from "@/utils";
 import {
   IonButton,
   IonButtons,
@@ -88,6 +89,8 @@ const ubahProfil = async () => {
   if (data.status === "OK") {
     await auth.setAuthUser(akun.value);
     await modalController.dismiss(true);
+  } else if (data.status === "FAIL") {
+    await showToast(data.msg, "danger");
   }
 };
 
