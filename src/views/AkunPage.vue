@@ -128,7 +128,7 @@ const share = async () =>
   await Share.share({
     text: "Download dan gunakan eAngkot sekarang juga!",
     url: "https://google.com/",
-    dialogTitle: "Downdload eAngkot",
+    dialogTitle: "Download eAngkot",
   });
 
 const logout = async () => {
