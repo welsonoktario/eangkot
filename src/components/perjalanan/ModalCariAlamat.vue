@@ -1,75 +1,63 @@
 <template>
-  <ion-header>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-button @click="closeModal(null)">
-          <ion-icon slot="icon-only" :icon="arrowBack"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-title>{{ title }}</ion-title>
-      <ion-buttons slot="end">
-        <ion-button @click="closeModal('pilih')">
-          <ion-icon slot="icon-only" :icon="mapOutline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-    <ion-toolbar v-if="isPlatform('ios')" class="searchbar">
-      <ion-searchbar
-        ref="searchBar"
-        :debounce="500"
-        v-model="query"
-      ></ion-searchbar>
-    </ion-toolbar>
-  </ion-header>
-  <ion-content>
-    <ion-toolbar v-if="isPlatform('android')" class="searchbar">
-      <ion-searchbar
-        ref="searchBar"
-        :debounce="500"
-        v-model="query"
-      ></ion-searchbar>
-    </ion-toolbar>
-    <ion-list>
-      <ion-item
-        v-if="isJemput"
-        detail
-        button
-        @click="closeModal('current')"
-        lines="inset"
-      >
-        <ion-label>Gunakan lokasi saat ini</ion-label>
-      </ion-item>
-      <ion-item
-        v-for="item in results"
-        detail
-        button
-        @click="closeModal(item)"
-        :key="item.id"
-      >
-        <ion-label>{{ item.place_name }}</ion-label>
-      </ion-item>
-    </ion-list>
-  </ion-content>
+  <modal-layout
+    @start-click="closeModal(null)"
+    @end-click="closeModal('pilih')"
+    :title="title"
+  >
+    <template #header>
+      <ion-toolbar v-if="isPlatform('ios')" class="searchbar">
+        <ion-searchbar
+          ref="searchBar"
+          :debounce="500"
+          v-model="query"
+        ></ion-searchbar>
+      </ion-toolbar>
+    </template>
+
+    <template #content>
+      <ion-toolbar v-if="isPlatform('android')" class="searchbar">
+        <ion-searchbar
+          ref="searchBar"
+          :debounce="500"
+          v-model="query"
+        ></ion-searchbar>
+      </ion-toolbar>
+      <ion-list>
+        <ion-item
+          v-if="isJemput"
+          detail
+          button
+          @click="closeModal('current')"
+          lines="inset"
+        >
+          <ion-label>Gunakan lokasi saat ini</ion-label>
+        </ion-item>
+        <ion-item
+          v-for="item in results"
+          detail
+          button
+          @click="closeModal(item)"
+          :key="item.id"
+        >
+          <ion-label>{{ item.place_name }}</ion-label>
+        </ion-item>
+      </ion-list>
+    </template>
+  </modal-layout>
 </template>
 
 <script lang="ts" setup>
 import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
   IonItem,
   IonLabel,
   IonList,
   IonSearchbar,
-  IonTitle,
   IonToolbar,
   isPlatform,
   modalController,
 } from "@ionic/vue";
-import { arrowBack, mapOutline } from "ionicons/icons";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
+import ModalLayout from "../ModalLayout.vue";
 
 const props = defineProps({
   title: { type: String, default: "Cari Alamat" },

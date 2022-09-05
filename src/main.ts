@@ -23,7 +23,7 @@ import "@ionic/vue/css/text-alignment.css";
 import "@ionic/vue/css/text-transformation.css";
 
 /* Theme variables */
-import "./theme/variables.css";
+import "./theme/variables.scss";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 

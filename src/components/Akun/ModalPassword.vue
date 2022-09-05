@@ -1,72 +1,61 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <IonTitle>{{
-        auth.authUser.secure ? "Ubah Password" : "Tambah Password"
-      }}</IonTitle>
-      <IonButtons slot="end">
-        <IonButton @click="back()">
-          <IonIcon
-            slot="icon-only"
-            :md="closeOutline"
-            :ios="closeCircle"
-          ></IonIcon>
-        </IonButton>
-      </IonButtons>
-    </template>
-
+  <modal-layout
+    :title="auth.authUser.hasPassword ? 'Ubah Password' : 'Tambah Password'"
+    @start-click="back()"
+  >
     <template #content>
       <form>
-        <IonList :inset="true" class="ion-padding">
-          <IonItem v-if="auth.authUser.secure">
-            <IonLabel position="floating">Password lama</IonLabel>
-            <IonInput type="password" v-model="form.passwordLama"></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">{{
-              auth.authUser.secure ? "Password baru" : "Password"
-            }}</IonLabel>
-            <IonInput type="password" v-model="form.password"></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">{{
-              auth.authUser.secure ? "Ulangi password baru" : "Ulangi password"
-            }}</IonLabel>
-            <IonInput type="password" v-model="form.confirmPassword"></IonInput>
-          </IonItem>
-        </IonList>
+        <ion-list :inset="true" class="ion-padding">
+          <ion-item v-if="auth.authUser.hasPassword">
+            <ion-label position="floating">Password lama</ion-label>
+            <ion-input type="password" v-model="form.passwordLama"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">{{
+              auth.authUser.hasPassword ? "Password baru" : "Password"
+            }}</ion-label>
+            <ion-input type="password" v-model="form.password"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">{{
+              auth.authUser.hasPassword
+                ? "Ulangi password baru"
+                : "Ulangi password"
+            }}</ion-label>
+            <ion-input
+              type="password"
+              v-model="form.confirmPassword"
+            ></ion-input>
+          </ion-item>
+        </ion-list>
       </form>
     </template>
 
     <template #footer>
-      <IonButton
+      <e-a-button
         @click="ubahPassword()"
         class="ion-margin"
         expand="block"
         fill="solid"
       >
         Simpan
-      </IonButton>
+      </e-a-button>
     </template>
-  </AppLayout>
+  </modal-layout>
 </template>
 
 <script lang="ts" setup>
-import AppLayout from "@/layouts/AppLayout.vue";
+import EAButton from "@/components/EAButton.vue";
+import ModalLayout from "@/components/ModalLayout.vue";
 import { useAuth } from "@/stores";
 import { showToast } from "@/utils";
 import {
-  IonButton,
-  IonButtons,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
-  IonTitle,
   modalController,
 } from "@ionic/vue";
-import { closeCircle, closeOutline } from "ionicons/icons";
 import { ref } from "vue";
 
 const auth = useAuth();
@@ -85,7 +74,7 @@ const ubahPassword = async () => {
     const data = await res.data;
 
     if (data.status == "OK") {
-      auth.authUser.secure = true;
+      auth.authUser.hasPassword = true;
 
       await auth.setAuthUser(auth.authUser);
       await modalController.dismiss(true);

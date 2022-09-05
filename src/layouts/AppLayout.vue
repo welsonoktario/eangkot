@@ -1,24 +1,10 @@
 <template>
   <IonPage>
-    <IonHeader
-      v-if="!fullscreen"
-      :collapse="largeTitle ? 'fade' : null"
-      :translucent="largeTitle"
-    >
-      <IonToolbar>
-        <slot name="header">
-          <IonTitle> {{ title }} </IonTitle>
-        </slot>
-      </IonToolbar>
+    <IonHeader class="ion-no-border">
+      <slot name="header"> </slot>
     </IonHeader>
 
     <IonContent>
-      <IonHeader v-if="largeTitle" collapse="condense">
-        <IonToolbar>
-          <IonTitle size="large">{{ title }}</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-
       <slot name="content"></slot>
     </IonContent>
 
@@ -29,21 +15,8 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  IonContent,
-  IonFooter,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/vue";
+import { IonContent, IonFooter, IonHeader, IonPage } from "@ionic/vue";
 import { useSlots } from "vue";
-
-defineProps({
-  title: String,
-  largeTitle: Boolean,
-  fullscreen: Boolean,
-});
 
 const slots = useSlots();
 </script>

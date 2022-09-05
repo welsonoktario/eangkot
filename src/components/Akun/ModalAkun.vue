@@ -1,81 +1,64 @@
 <template>
-  <AppLayout title="Ubah Profil">
-    <template #header>
-      <IonButtons slot="end">
-        <IonButton @click="back()">
-          <IonIcon
-            slot="icon-only"
-            :md="closeOutline"
-            :ios="closeCircle"
-          ></IonIcon>
-        </IonButton>
-      </IonButtons>
-      <IonTitle>Ubah Profil</IonTitle>
-    </template>
-
+  <modal-layout title="Ubah Profil" @start-click="back()">
     <template #content>
       <form @submit.prevent="ubahProfil()">
-        <IonList :inset="true" class="ion-padding">
-          <IonItem>
-            <IonLabel position="floating">Nama</IonLabel>
-            <IonInput
+        <ion-list :inset="true" class="ion-padding">
+          <ion-item>
+            <ion-label position="floating">Nama</ion-label>
+            <ion-input
               type="text"
               name="nama"
               placeholder="Nama"
               v-model="akun.nama"
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">Email</IonLabel>
-            <IonInput
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input
               type="email"
               name="email"
               :placeholder="akun.email ? 'Email' : 'Tambah email'"
               v-model="akun.email"
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">No. HP</IonLabel>
-            <IonInput
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">No. HP</ion-label>
+            <ion-input
               type="tel"
               name="noHp"
               placeholder="No. HP"
               v-model="akun.noHp"
-            ></IonInput>
-          </IonItem>
-        </IonList>
+            ></ion-input>
+          </ion-item>
+        </ion-list>
       </form>
     </template>
 
     <template #footer>
-      <IonButton
+      <e-a-button
         @click="ubahProfil()"
         class="ion-margin"
         expand="block"
         fill="solid"
       >
         Simpan
-      </IonButton>
+      </e-a-button>
     </template>
-  </AppLayout>
+  </modal-layout>
 </template>
 
 <script lang="ts" setup>
-import AppLayout from "@/layouts/AppLayout.vue";
+import EAButton from "@/components/EAButton.vue";
+import ModalLayout from "@/components/ModalLayout.vue";
 import { useAuth } from "@/stores";
 import { showToast } from "@/utils";
 import {
-  IonButton,
-  IonButtons,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
-  IonTitle,
   modalController,
 } from "@ionic/vue";
-import { closeCircle, closeOutline } from "ionicons/icons";
 import { ref } from "vue";
 
 const auth = useAuth();

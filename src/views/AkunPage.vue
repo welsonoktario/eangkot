@@ -1,5 +1,9 @@
 <template>
-  <AppLayout title="Akun" :largeTitle="true">
+  <AppLayout>
+    <template #header>
+      <AppBar title="Akun" />
+    </template>
+
     <template #content>
       <IonItem class="ion-padding-vertical" lines="none">
         <IonLabel v-if="auth.authUser" class="ion-text-center">
@@ -26,7 +30,7 @@
         <IonItem @click="password()" button detail>
           <IonIcon slot="start" :md="key" :ios="keyOutline"></IonIcon>
           <IonLabel>{{
-            auth.authUser?.secure ? "Ubah password" : "Tambah password"
+            auth.authUser?.hasPassword ? "Ubah password" : "Tambah password"
           }}</IonLabel>
         </IonItem>
         <IonItem @click="share()" button detail>
@@ -60,6 +64,7 @@
 <script lang="ts" setup>
 import ModalAkun from "@/components/Akun/ModalAkun.vue";
 import ModalPassword from "@/components/Akun/ModalPassword.vue";
+import AppBar from "@/components/AppBar.vue";
 import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuth } from "@/stores";
 import { showToast } from "@/utils";

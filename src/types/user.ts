@@ -3,4 +3,5 @@ export interface User {
   nama: string;
   noHp: string;
   email?: string;
+  hasPassword: boolean;
 }

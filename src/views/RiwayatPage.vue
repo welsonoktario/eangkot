@@ -1,5 +1,9 @@
 <template>
-  <AppLayout title="Riwayat" :largeTitle="true">
+  <AppLayout>
+    <template #header>
+      <AppBar title="Riwayat" />
+    </template>
+
     <template #content>
       <IonList v-if="riwayat.pesanans.length" lines="none" class="h-full">
         <CardRiwayat
@@ -59,6 +63,7 @@ import {
   modalController,
 } from "@ionic/vue";
 import { getCurrentInstance } from "vue";
+import AppBar from "@/components/AppBar.vue";
 
 const context = getCurrentInstance();
 const riwayat = useRiwayat();

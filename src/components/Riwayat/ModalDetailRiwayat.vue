@@ -1,121 +1,114 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <IonTitle>Detail Riwayat</IonTitle>
-      <IonButtons slot="end">
-        <IonButton @click="back()">
-          <IonIcon
-            slot="icon-only"
-            :md="closeOutline"
-            :ios="closeCircle"
-            color="medium"
-          ></IonIcon>
-        </IonButton>
-      </IonButtons>
-    </template>
-
+  <modal-layout title="Detail Riwayat" @start-click="back()">
     <template #content>
-      <IonList inset>
-        <IonListHeader>
-          <IonLabel>Detail Pesanan</IonLabel>
-        </IonListHeader>
-        <IonItem>
-          <IonIcon slot="start" :md="calendar" :ios="calendarOutline"></IonIcon>
-          <IonLabel>{{ pesanan.tanggal }}</IonLabel>
-        </IonItem>
-        <IonItem>
-          <IonIcon slot="start" :md="person" :ios="personOutline"></IonIcon>
-          <IonLabel
+      <ion-list inset>
+        <ion-list-header>
+          <ion-label>Detail Pesanan</ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-icon
+            slot="start"
+            :md="calendar"
+            :ios="calendarOutline"
+          ></ion-icon>
+          <ion-label>{{ pesanan.tanggal }}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" :md="person" :ios="personOutline"></ion-icon>
+          <ion-label
             >{{ pesanan.driver.user.nama }},
-            {{ pesanan.driver.angkot.noKendaraan }}</IonLabel
+            {{ pesanan.driver.angkot.noKendaraan }}</ion-label
           >
-        </IonItem>
-        <IonItem>
-          <IonIcon slot="start" :md="car" :ios="carOutline"></IonIcon>
-          <IonLabel>{{ pesanan.driver.angkot.trayek.kode }}</IonLabel>
-        </IonItem>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" :md="car" :ios="carOutline"></ion-icon>
+          <ion-label>{{ pesanan.driver.angkot.trayek.kode }}</ion-label>
+        </ion-item>
 
-        <IonListHeader>
-          <IonLabel>Detail Transaksi</IonLabel>
-        </IonListHeader>
-        <IonItem>
-          <IonIcon slot="start" :md="calendar" :ios="calendarOutline"></IonIcon>
-          <IonLabel>{{ pesanan.transaksi.tanggal }}</IonLabel>
-        </IonItem>
-        <IonItem>
-          <IonIcon slot="start" :md="cash" :ios="cashOutline"></IonIcon>
-          <IonLabel>{{ ongkos }}</IonLabel>
-        </IonItem>
-        <IonItem>
-          <IonIcon slot="start" :md="time" :ios="timeOutline"></IonIcon>
-          <IonLabel>{{ durasi }}</IonLabel>
-        </IonItem>
-        <IonItem>
-          <IonIcon slot="start" :md="map" :ios="mapOutline"></IonIcon>
-          <IonLabel>{{ pesanan.transaksi.jarakPerjalanan }} km</IonLabel>
-        </IonItem>
+        <ion-list-header>
+          <ion-label>Detail Transaksi</ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-icon
+            slot="start"
+            :md="calendar"
+            :ios="calendarOutline"
+          ></ion-icon>
+          <ion-label>{{ pesanan.transaksi.tanggal }}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" :md="cash" :ios="cashOutline"></ion-icon>
+          <ion-label>{{ ongkos }}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" :md="time" :ios="timeOutline"></ion-icon>
+          <ion-label>{{ durasi }}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" :md="map" :ios="mapOutline"></ion-icon>
+          <ion-label>{{ pesanan.transaksi.jarakPerjalanan }} km</ion-label>
+        </ion-item>
         <template v-if="pesanan.transaksi.ulasan">
-          <IonListHeader>
-            <IonLabel>Rating dan Komentar</IonLabel>
-          </IonListHeader>
-          <IonItem class="item-input">
-            <IonIcon slot="start" :md="star" :ios="starOutline"></IonIcon>
+          <ion-list-header>
+            <ion-label>Rating dan Komentar</ion-label>
+          </ion-list-header>
+          <ion-item class="item-input">
+            <ion-icon slot="start" :md="star" :ios="starOutline"></ion-icon>
             <div class="select-wrapper">
-              <IonLabel>Rating</IonLabel>
-              <IonSelect
+              <ion-label>Rating</ion-label>
+              <ion-select
                 :selectedText="pesanan.transaksi.ulasan?.rating.toString()"
                 :disabled="true"
               >
-                <IonSelectOption value="1">1</IonSelectOption>
-                <IonSelectOption value="2">2</IonSelectOption>
-                <IonSelectOption value="3">3</IonSelectOption>
-                <IonSelectOption value="4">4</IonSelectOption>
-                <IonSelectOption value="5">5</IonSelectOption>
-              </IonSelect>
+                <ion-select-option value="1">1</ion-select-option>
+                <ion-select-option value="2">2</ion-select-option>
+                <ion-select-option value="3">3</ion-select-option>
+                <ion-select-option value="4">4</ion-select-option>
+                <ion-select-option value="5">5</ion-select-option>
+              </ion-select>
             </div>
-          </IonItem>
-          <IonItem class="ion-margin-bottom item-input">
-            <IonLabel position="stacked">Komentar</IonLabel>
-            <IonTextarea
+          </ion-item>
+          <ion-item class="ion-margin-bottom item-input">
+            <ion-label position="stacked">Komentar</ion-label>
+            <ion-textarea
               placeholder="Berikan komentar"
               :rows="3"
               :autoGrow="true"
               :value="pesanan.transaksi.ulasan?.komentar"
               :readonly="true"
-            ></IonTextarea>
-          </IonItem>
+            ></ion-textarea>
+          </ion-item>
         </template>
-      </IonList>
+      </ion-list>
 
-      <IonModal
+      <ion-modal
         v-if="!pesanan.transaksi.ulasan"
         :isOpen="isModalRatingOpen"
         v-on:didDismiss="isModalRatingOpen = false"
       >
-        <ModalRating :id="id" />
-      </IonModal>
+        <modal-rating :id="id" />
+      </ion-modal>
     </template>
 
     <template v-if="!pesanan.transaksi.ulasan" #footer>
-      <IonButton
+      <e-a-button
         @click="isModalRatingOpen = true"
         class="ion-margin"
         expand="block"
         fill="solid"
       >
         Berikan Ulasan
-      </IonButton>
+      </e-a-button>
     </template>
-  </AppLayout>
+  </modal-layout>
 </template>
 
 <script lang="ts" setup>
-import AppLayout from "@/layouts/AppLayout.vue";
+import EAButton from "@/components/EAButton.vue";
+import ModalLayout from "@/components/ModalLayout.vue";
 import { useRiwayat } from "@/stores";
 import { rupiah } from "@/utils";
 import {
-  IonButton,
-  IonButtons,
   IonIcon,
   IonItem,
   IonLabel,
@@ -125,7 +118,6 @@ import {
   IonSelect,
   IonSelectOption,
   IonTextarea,
-  IonTitle,
   modalController,
 } from "@ionic/vue";
 import {
@@ -135,8 +127,6 @@ import {
   carOutline,
   cash,
   cashOutline,
-  closeCircle,
-  closeOutline,
   map,
   mapOutline,
   person,

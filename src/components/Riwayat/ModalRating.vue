@@ -1,19 +1,5 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <IonTitle>Detail Riwayat</IonTitle>
-      <IonButtons slot="end">
-        <IonButton @click="back()">
-          <IonIcon
-            slot="icon-only"
-            :md="closeOutline"
-            :ios="closeCircle"
-            color="medium"
-          ></IonIcon>
-        </IonButton>
-      </IonButtons>
-    </template>
-
+  <modal-layout title="Beri Ulasan" @start-click="back()">
     <template #content>
       <IonList>
         <IonItem class="item-input">
@@ -41,26 +27,25 @@
     </template>
 
     <template #footer>
-      <IonButton
+      <e-a-button
         @click="addUlasan()"
         class="ion-margin"
         expand="block"
         fill="solid"
       >
         Tambah Ulasan
-      </IonButton>
+      </e-a-button>
     </template>
-  </AppLayout>
+  </modal-layout>
 </template>
 
 <script lang="ts" setup>
-import AppLayout from "@/layouts/AppLayout.vue";
-import { Ulasan } from "@/types";
+import EAButton from "@/components/EAButton.vue";
+import ModalLayout from "@/components/ModalLayout.vue";
 import { useRiwayat } from "@/stores";
+import { Ulasan } from "@/types";
 import { showToast } from "@/utils";
 import {
-  IonButton,
-  IonButtons,
   IonIcon,
   IonItem,
   IonLabel,
@@ -68,10 +53,9 @@ import {
   IonSelect,
   IonSelectOption,
   IonTextarea,
-  IonTitle,
   modalController,
 } from "@ionic/vue";
-import { closeCircle, closeOutline, star, starOutline } from "ionicons/icons";
+import { star, starOutline } from "ionicons/icons";
 import { ref } from "vue";
 
 const props = defineProps({
@@ -91,7 +75,7 @@ const ulasan = ref<Ulasan>({
 const back = async () => await modalController.dismiss();
 
 const addUlasan = async () => {
-  const transaksi = riwayat.findTransaksi(props.id);
+  const transaksi = riwayat.findPesanan(props.id).transaksi;
   const res = await riwayat.addUlasan(props.id, ulasan.value);
   const { data, status } = res;
 

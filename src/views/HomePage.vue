@@ -1,39 +1,38 @@
 <template>
   <AppLayout title="eAngkot" :largeTitle="true">
     <template #header>
-      <IonTitle>Home</IonTitle>
+      <AppBar title="Home" />
     </template>
 
     <template #content>
-      <IonGrid class="ion-padding-horizontal">
-        <IonRow v-if="user">
-          <IonCol>
+      <ion-grid class="ion-padding-horizontal">
+        <ion-row v-if="user">
+          <ion-col>
             <h1>
               Halo, <strong>{{ user.nama }}</strong>
             </h1>
-          </IonCol>
-        </IonRow>
-        <IonRow>
-          <IonCol>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
             <h3>Mau kemana hari ini?</h3>
-            <ion-button router-link="/perjalanan" expand="block">
+            <e-a-button router-link="/perjalanan" expand="block">
               Cari Angkot
-            </ion-button>
-          </IonCol>
-        </IonRow>
-        <IonRow>
-          <IonCol class="ion-padding-top"> </IonCol>
-        </IonRow>
-      </IonGrid>
+            </e-a-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </template>
   </AppLayout>
 </template>
 <script lang="ts" setup>
+import AppBar from "@/components/AppBar.vue";
+import EAButton from "@/components/EAButton.vue";
 import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuth } from "@/stores";
 import { User } from "@/types";
 import { Preferences } from "@capacitor/preferences";
-import { IonButton, IonCol, IonGrid, IonRow, IonTitle, loadingController } from "@ionic/vue";
+import { IonCol, IonGrid, IonRow, loadingController } from "@ionic/vue";
 import { onMounted, ref } from "vue";
 
 const auth = useAuth();
@@ -45,7 +44,7 @@ const loadUser = async () => {
   const loading = await loadingController.create({
     message: "Mohon tunggu...",
   });
-  
+
   await loading.present();
 
   const { value } = await Preferences.get({ key: "user" });

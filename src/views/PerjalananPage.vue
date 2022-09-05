@@ -1,10 +1,11 @@
 <template>
-  <AppLayout title="Perjalanan">
+  <AppLayout>
     <template #header>
-      <IonButtons slot="start">
-        <IonBackButton></IonBackButton>
-      </IonButtons>
-      <IonTitle>Perjalanan</IonTitle>
+      <AppBar title="Perjalanan">
+        <template #start>
+          <IonBackButton />
+        </template>
+      </AppBar>
     </template>
 
     <template #content>
@@ -21,7 +22,7 @@
         </IonRow>
         <IonRow>
           <IonCol>
-             <IonList :inset="true">
+            <IonList :inset="true">
               <IonItem>
                 <IonLabel position="floating">Lokasi Jemput</IonLabel>
                 <IonInput
@@ -49,12 +50,12 @@
 </template>
 
 <script lang="ts" setup>
+import AppBar from "@/components/AppBar.vue";
 import ModalCariAlamat from "@/components/Perjalanan/ModalCariAlamat.vue";
 import AppLayout from "@/layouts/AppLayout.vue";
 import { Geolocation } from "@capacitor/geolocation";
 import {
   IonBackButton,
-  IonButtons,
   IonCol,
   IonGrid,
   IonInput,
@@ -62,8 +63,7 @@ import {
   IonLabel,
   IonList,
   IonRow,
-  IonTitle,
-  modalController
+  modalController,
 } from "@ionic/vue";
 import { Feature, LineString } from "geojson";
 import { GeolocateControl, LngLat, LngLatBounds, Map, Marker } from "mapbox-gl";
