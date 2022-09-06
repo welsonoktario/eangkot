@@ -1,7 +1,7 @@
 <template>
-  <AppLayout title="eAngkot" :largeTitle="true">
+  <app-layout title="eAngkot" :largeTitle="true">
     <template #header>
-      <AppBar title="Home" />
+      <app-bar title="Home" />
     </template>
 
     <template #content>
@@ -23,7 +23,7 @@
         </ion-row>
       </ion-grid>
     </template>
-  </AppLayout>
+  </app-layout>
 </template>
 <script lang="ts" setup>
 import AppBar from "@/components/AppBar.vue";

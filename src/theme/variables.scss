@@ -1,8 +1,8 @@
 /* Ionic Variables and Theming. For more info, please see:
 http://ionicframework.com/docs/theming/ */
 
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;600&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700;8..144,800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700;8..144,800&display=swap');
 
 /** Ionic CSS Variables **/
 :root {
@@ -149,7 +149,7 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-light-shade: #04121b;
     --ion-color-light-tint: #1d2c35;
 
-    --ion-font-family: "Roboto Flex";
+    --ion-font-family: 'Roboto Flex';
   }
 
   /*
@@ -244,7 +244,7 @@ http://ionicframework.com/docs/theming/ */
 }
 
 body {
-  --ion-font-family: "Roboto Flex";
+  --ion-font-family: 'Roboto Flex';
 }
 
 .md {
@@ -274,5 +274,5 @@ ion-spinner {
 }
 
 .font-serif {
-  font-family: "Roboto Serif";
+  font-family: 'Roboto Serif';
 }

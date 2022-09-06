@@ -4,24 +4,11 @@
     @end-click="closeModal('pilih')"
     :title="title"
   >
-    <template #header>
-      <ion-toolbar v-if="isPlatform('ios')" class="searchbar">
-        <ion-searchbar
-          ref="searchBar"
-          :debounce="500"
-          v-model="query"
-        ></ion-searchbar>
-      </ion-toolbar>
-    </template>
-
     <template #content>
-      <ion-toolbar v-if="isPlatform('android')" class="searchbar">
-        <ion-searchbar
-          ref="searchBar"
-          :debounce="500"
-          v-model="query"
-        ></ion-searchbar>
+      <ion-toolbar class="searchbar">
+        <ion-searchbar ref="searchBar" :debounce="500" v-model="query" />
       </ion-toolbar>
+
       <ion-list>
         <ion-item
           v-if="isJemput"
@@ -53,57 +40,48 @@ import {
   IonList,
   IonSearchbar,
   IonToolbar,
-  isPlatform,
   modalController,
-} from "@ionic/vue";
-import { computed, nextTick, onMounted, ref, watch } from "vue";
-import ModalLayout from "../ModalLayout.vue";
+} from '@ionic/vue'
+import { computed, ref, watch } from 'vue'
+import ModalLayout from '../ModalLayout.vue'
 
 const props = defineProps({
-  title: { type: String, default: "Cari Alamat" },
-});
+  title: { type: String, default: 'Cari Alamat' },
+})
 
-const searchBar = ref(null);
-const query = ref("");
-const results = ref([]);
+const searchBar = ref(null)
+const query = ref('')
+const results = ref([])
 
-onMounted(() => {
-  nextTick(() => {
-    setTimeout(async () => await searchBar.value.ionFocus, 150);
-  });
-});
+watch(query, async () => cariAlamat())
 
-watch(query, async () => cariAlamat());
+const isJemput = computed(() => props.title.includes('jemput'))
 
-const isJemput = computed(() => props.title.includes("jemput"));
-
-const closeModal = (data: any) => modalController.dismiss(data);
+const closeModal = (data: any) => modalController.dismiss(data)
 
 const cariAlamat = async () => {
-  const q = encodeURI(query.value);
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?country=ID&region=ID-JI&access_token=pk.eyJ1Ijoid2Vsc29ub2t0YXJpbyIsImEiOiJja3liam9zNW0wZnppMnVvZGdwaW1tZDltIn0.VZSKrmUqnhui_Z4XQYrvYg`;
+  const q = encodeURI(query.value)
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?country=ID&region=ID-JI&access_token=pk.eyJ1Ijoid2Vsc29ub2t0YXJpbyIsImEiOiJja3liam9zNW0wZnppMnVvZGdwaW1tZDltIn0.VZSKrmUqnhui_Z4XQYrvYg`
 
   fetch(url)
     .then((res) => res.json())
     .then((data) => {
-      results.value = data.features;
-    });
-};
+      results.value = data.features
+    })
+}
 </script>
 
-<style scoped>
-ion-toolbar.md {
-  --ion-background-color: #121212;
+<style lang="scss" scoped>
+ion-toolbar {
+  --background: #121212;
 }
 
-.md .searchbar {
-  padding-top: 2px;
-  --ion-background-color: transparent !important;
+.searchbar {
+  --ion-background-color: #212121 !important;
 }
-.ios .searchbar {
-  padding-top: 8px;
-}
-.ios .searchbar ion-searchbar {
-  padding: 0;
+
+ion-searchbar {
+  padding: 0 !important;
+  margin-top: -16px;
 }
 </style>
