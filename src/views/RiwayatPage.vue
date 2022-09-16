@@ -1,58 +1,59 @@
 <template>
-  <AppLayout>
+  <app-layout>
     <template #header>
-      <AppBar title="Riwayat" />
+      <app-bar title="Riwayat" />
     </template>
 
     <template #content>
-      <IonList v-if="riwayat.pesanans.length" lines="none" class="h-full">
-        <CardRiwayat
+      <ion-list v-if="riwayat.pesanans.length" lines="none" class="h-full">
+        <card-riwayat
           v-for="item in riwayat.pesanans"
           @click="detail(item.id)"
           :transaksi="item.transaksi"
           :key="item.id"
         />
-      </IonList>
+      </ion-list>
 
       <div v-else-if="loading" class="spin">
         <ion-spinner></ion-spinner>
       </div>
 
-      <IonGrid
+      <ion-grid
         v-else-if="!riwayat.pesanans.length"
         fixed
         style="height: 100%; display: flex; flex-flow: column"
       >
-        <IonRow class="ion-align-items-center" style="flex-grow: 1">
-          <IonCol class="ion-text-center ion-margin-horizontal">
+        <ion-row class="ion-align-items-center" style="flex-grow: 1">
+          <ion-col class="ion-text-center ion-margin-horizontal">
             <h2>Belum ada riwayat transaksi</h2>
-            <IonButton router-link="/perjalanan" fill="clear">
+            <ion-button router-link="/perjalanan" fill="clear">
               Cari Angkot
-            </IonButton>
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
 
-      <IonGrid
+      <ion-grid
         v-else-if="error"
         fixed
         style="height: 100%; display: flex; flex-flow: column"
       >
-        <IonRow class="ion-align-items-center" style="flex-grow: 1">
-          <IonCol class="ion-text-center ion-margin-horizontal">
+        <ion-row class="ion-align-items-center" style="flex-grow: 1">
+          <ion-col class="ion-text-center ion-margin-horizontal">
             <h2>{{ error.msg }}</h2>
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </template>
-  </AppLayout>
+  </app-layout>
 </template>
 
 <script lang="ts" setup>
-import CardRiwayat from "@/components/Riwayat/CardRiwayat.vue";
-import ModalDetailRiwayat from "@/components/Riwayat/ModalDetailRiwayat.vue";
-import AppLayout from "@/layouts/AppLayout.vue";
-import { useRiwayat } from "@/stores";
+import AppBar from '@/components/AppBar.vue'
+import CardRiwayat from '@/components/Riwayat/CardRiwayat.vue'
+import ModalDetailRiwayat from '@/components/Riwayat/ModalDetailRiwayat.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { useRiwayat } from '@/stores'
 import {
   IonButton,
   IonCol,
@@ -61,13 +62,10 @@ import {
   IonRow,
   IonSpinner,
   modalController,
-} from "@ionic/vue";
-import { getCurrentInstance } from "vue";
-import AppBar from "@/components/AppBar.vue";
+} from '@ionic/vue'
 
-const context = getCurrentInstance();
-const riwayat = useRiwayat();
-const { error, loading } = riwayat.loadRiwayat();
+const riwayat = useRiwayat()
+const { error, loading } = riwayat.loadRiwayat()
 
 const detail = async (id: number) => {
   const modal = await modalController.create({
@@ -75,12 +73,12 @@ const detail = async (id: number) => {
     componentProps: {
       id,
     },
-    canDismiss: true,
-    presentingElement: context.parent.refs.ionRouterOutlet as HTMLElement,
-  });
+    breakpoints: [0, 0.75, 1],
+    initialBreakpoint: 0.75,
+  })
 
-  await modal.present();
-};
+  await modal.present()
+}
 </script>
 
 <style scoped>

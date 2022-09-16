@@ -1,35 +1,35 @@
 <template>
-  <IonHeader class="ion-no-border">
-    <AppBar :title="title">
+  <ion-header class="ion-no-border">
+    <app-bar :title="title">
       <template #start>
-        <IonButtons>
-          <IonButton class="ion-no-padding" fill="clear" @click="onStartClick">
-            <IonIcon
+        <ion-buttons>
+          <ion-button class="ion-no-padding" fill="clear" @click="onStartClick">
+            <ion-icon
               slot="icon-only"
               color="primary"
               :icon="closeOutline"
-            ></IonIcon>
-          </IonButton>
-        </IonButtons>
+            ></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </template>
 
       <template #end v-if="endIcon">
-        <IonButton @click="onEndClick">
-          <IonIcon slot="icon-only" color="primary" :icon="endIcon"></IonIcon>
-        </IonButton>
+        <ion-button @click="onEndClick">
+          <ion-icon slot="icon-only" color="primary" :icon="endIcon"></ion-icon>
+        </ion-button>
       </template>
-    </AppBar>
+    </app-bar>
 
     <slot name="header" v-if="slots.header" />
-  </IonHeader>
+  </ion-header>
 
-  <IonContent>
+  <ion-content>
     <slot name="content" />
-  </IonContent>
+  </ion-content>
 
-  <IonFooter v-if="slots.footer">
+  <ion-footer v-if="slots.footer">
     <slot name="footer" />
-  </IonFooter>
+  </ion-footer>
 </template>
 
 <script lang="ts" setup>
@@ -40,10 +40,10 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-} from "@ionic/vue";
-import { closeOutline } from "ionicons/icons";
-import { useSlots } from "vue";
-import AppBar from "./AppBar.vue";
+} from '@ionic/vue'
+import { closeOutline } from 'ionicons/icons'
+import { useSlots } from 'vue'
+import AppBar from './AppBar.vue'
 
 defineProps({
   title: String,
@@ -52,15 +52,15 @@ defineProps({
     default: closeOutline,
   },
   endIcon: String,
-});
+})
 
 const emits = defineEmits<{
-  (e: "startClick", params?: any): void;
-  (e: "endClick", params?: any): void;
-}>();
+  (e: 'startClick', params?: any): void
+  (e: 'endClick', params?: any): void
+}>()
 
-const slots = useSlots();
+const slots = useSlots()
 
-const onStartClick = (params: any) => emits("startClick", params);
-const onEndClick = (params: any) => emits("endClick", params);
+const onStartClick = (params: any) => emits('startClick', params)
+const onEndClick = (params: any) => emits('endClick', params)
 </script>

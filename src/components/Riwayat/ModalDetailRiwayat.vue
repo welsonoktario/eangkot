@@ -104,10 +104,10 @@
 </template>
 
 <script lang="ts" setup>
-import EAButton from "@/components/EAButton.vue";
-import ModalLayout from "@/components/ModalLayout.vue";
-import { useRiwayat } from "@/stores";
-import { rupiah } from "@/utils";
+import EAButton from '@/components/EAButton.vue'
+import ModalLayout from '@/components/ModalLayout.vue'
+import { useRiwayat } from '@/stores'
+import { rupiah } from '@/utils'
 import {
   IonIcon,
   IonItem,
@@ -119,7 +119,7 @@ import {
   IonSelectOption,
   IonTextarea,
   modalController,
-} from "@ionic/vue";
+} from '@ionic/vue'
 import {
   calendar,
   calendarOutline,
@@ -135,35 +135,35 @@ import {
   starOutline,
   time,
   timeOutline,
-} from "ionicons/icons";
-import { computed, ref } from "vue";
-import ModalRating from "./ModalRating.vue";
+} from 'ionicons/icons'
+import { computed, ref } from 'vue'
+import ModalRating from './ModalRating.vue'
 
 const props = defineProps({
   id: {
     type: Number,
     required: true,
   },
-});
+})
 
-const riwayat = useRiwayat();
-const pesanan = ref(riwayat.findPesanan(props.id));
-const ongkos = computed(() => rupiah(pesanan.value.transaksi.ongkos));
+const riwayat = useRiwayat()
+const pesanan = ref(riwayat.findPesanan(props.id))
+const ongkos = computed(() => rupiah(pesanan.value.transaksi.ongkos))
 const durasi = computed(() => {
-  const d = pesanan.value.transaksi.durasiPerjalanan;
-  const h = Math.floor(d / 3600);
-  const m = Math.floor((d % 3600) / 60);
-  const s = Math.floor((d % 3600) % 60);
+  const d = pesanan.value.transaksi.durasiPerjalanan
+  const h = Math.floor(d / 3600)
+  const m = Math.floor((d % 3600) / 60)
+  const s = Math.floor((d % 3600) % 60)
 
-  const hDisplay = h > 0 ? h + " jam " : "";
-  const mDisplay = m > 0 ? m + " menit " : "";
-  const sDisplay = s > 0 ? s + " detik" : "";
+  const hDisplay = h > 0 ? h + ' jam ' : ''
+  const mDisplay = m > 0 ? m + ' menit ' : ''
+  const sDisplay = s > 0 ? s + ' detik' : ''
 
-  return hDisplay + mDisplay + sDisplay;
-});
-const isModalRatingOpen = ref(false);
+  return hDisplay + mDisplay + sDisplay
+})
+const isModalRatingOpen = ref(false)
 
-const back = async () => await modalController.dismiss();
+const back = async () => await modalController.dismiss()
 </script>
 
 <style scoped>

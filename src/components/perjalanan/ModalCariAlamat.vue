@@ -72,12 +72,18 @@ const cariAlamat = async () => {
 </script>
 
 <style lang="scss" scoped>
-ion-toolbar {
-  --background: #121212;
+.searchbar {
+  --ion-background-color: #fff !important;
 }
 
-.searchbar {
-  --ion-background-color: #212121 !important;
+@media (prefers-color-scheme: dark) {
+  .searchbar {
+    --ion-background-color: #212121 !important;
+  }
+
+  ion-toolbar {
+    --background: #121212;
+  }
 }
 
 ion-searchbar {

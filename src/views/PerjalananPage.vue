@@ -23,33 +23,36 @@
         <ion-row>
           <ion-col>
             <ion-list class="ion-padding-horizontal" inset>
-              <ion-item>
-                <ion-label position="floating">Trayek</ion-label>
+              <ion-item button detail>
+                <ion-label position="floating">Pilih trayek</ion-label>
                 <ion-input
                   v-model="destinasi.trayek"
-                  clearInput
                   readonly
                   @click="openModalTrayek()"
                 ></ion-input>
               </ion-item>
-              <ion-item>
+              <ion-item button detail v-if="destinasi.trayek">
                 <ion-label position="floating">Lokasi Jemput</ion-label>
                 <ion-input
                   v-model="destinasi.textJemput"
-                  clearInput
                   readonly
                   @click="openModal('Pilih lokasi jemput', 'jemput')"
                 ></ion-input>
               </ion-item>
-              <ion-item>
+              <ion-item button detail v-if="destinasi.trayek">
                 <ion-label position="floating">Lokasi Tujuan</ion-label>
                 <ion-input
                   v-model="destinasi.textTujuan"
-                  clearInput
                   readonly
                   @click="openModal('Pilih lokasi tujuan', 'tujuan')"
                 ></ion-input>
               </ion-item>
+              <e-a-button
+                v-if="destinasi.trayek"
+                class="ion-margin-top"
+                expand="block"
+                >Cari Angkot</e-a-button
+              >
             </ion-list>
           </ion-col>
         </ion-row>
@@ -60,6 +63,7 @@
 
 <script lang="ts" setup>
 import AppBar from '@/components/AppBar.vue'
+import EAButton from '@/components/EAButton.vue'
 import ModalCariAlamat from '@/components/Perjalanan/ModalCariAlamat.vue'
 import ModalPilihTrayek from '@/components/Perjalanan/ModalPilihTrayek.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -77,7 +81,8 @@ import {
   modalController,
 } from '@ionic/vue'
 import buffer from '@turf/buffer'
-import { Feature, LineString } from 'geojson'
+import { MultiLineString } from '@turf/helpers'
+import { LineString } from 'geojson'
 import { GeolocateControl, LngLat, LngLatBounds, Map, Marker } from 'mapbox-gl'
 import { onMounted, ref } from 'vue'
 
@@ -128,7 +133,7 @@ onMounted(async () => {
         features: [],
       },
     })
-    map.addSource('trayek-buffer', {
+    map.addSource('route', {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -144,21 +149,21 @@ onMounted(async () => {
         'line-cap': 'round',
       },
       paint: {
-        'line-color': 'red',
-        'line-width': 1,
+        'line-color': '#36817b',
+        'line-width': 2,
       },
     })
     map.addLayer({
-      id: 'trayek-buffer',
+      id: 'route',
       type: 'line',
-      source: 'trayek-buffer',
+      source: 'route',
       layout: {
         'line-join': 'round',
         'line-cap': 'round',
       },
       paint: {
-        'line-color': 'red',
-        'line-width': 1,
+        'line-color': '#000',
+        'line-width': 2,
       },
     })
   })
@@ -183,34 +188,12 @@ const getRoute = async () => {
   )
     .then((res) => res.json())
     .then((data) => {
-      const routes = data.routes[0]
-      const route = routes.geometry.coordinates
-      const geojson: Feature<LineString> = {
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: route,
-        },
-      }
+      const route = data.routes[0]
+      const ls: LineString = route.geometry
 
-      map.addLayer({
-        id: 'route',
-        type: 'line',
-        source: {
-          type: 'geojson',
-          data: geojson,
-        },
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#3887be',
-          'line-width': 5,
-          'line-opacity': 0.75,
-        },
-      })
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      map.getSource('route').setData(ls)
 
       const bounds = new LngLatBounds(route[0], route[0])
 
@@ -306,18 +289,16 @@ const drawMarker = () => {
 const drawTrayekLines = async () => {
   const rute = await import(`@/assets/rute-${destinasi.value.trayek}.json`)
 
-  /* const buffered = rute.default.features.map((feature: LineString) => {
-    buffer(feature, 25, { units: 'meters' })
+  const buffered = buffer(rute.geometry as MultiLineString, 75, {
+    units: 'meters',
   })
-
-  console.log(buffered) */
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
-  map.getSource('trayek').setData(rute.default)
+  map.getSource('trayek').setData(buffered)
   const bounds = new LngLatBounds()
 
-  rute.features[0].geometry.coordinates[0].forEach(function (feature) {
+  rute.geometry.coordinates[0].forEach(function (feature) {
     bounds.extend(feature)
   })
 
@@ -328,6 +309,10 @@ const drawTrayekLines = async () => {
 </script>
 
 <style scoped>
+ion-item {
+  align-items: center !important;
+}
+
 ion-content {
   --offset-bottom: auto !important;
   --overflow: auto;
