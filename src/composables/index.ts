@@ -1,1 +1,2 @@
-export * from "./get";
+export * from './currentLocation'
+export * from './get'

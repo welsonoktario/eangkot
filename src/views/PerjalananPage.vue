@@ -20,7 +20,7 @@
             ></div>
           </ion-col>
         </ion-row>
-        <ion-row>
+        <ion-row v-if="!isPerjalananStarted">
           <ion-col>
             <ion-list class="ion-padding-horizontal" inset>
               <ion-item button detail>
@@ -49,6 +49,7 @@
               </ion-item>
               <e-a-button
                 v-if="destinasi.trayek"
+                @click="cariAngkot()"
                 class="ion-margin-top"
                 expand="block"
                 >Cari Angkot</e-a-button
@@ -65,10 +66,12 @@
 import AppBar from '@/components/AppBar.vue'
 import EAButton from '@/components/EAButton.vue'
 import ModalCariAlamat from '@/components/Perjalanan/ModalCariAlamat.vue'
+import ModalMencari from '@/components/Perjalanan/ModalMencari.vue'
 import ModalPilihTrayek from '@/components/Perjalanan/ModalPilihTrayek.vue'
+import { useCurrentLocation } from '@/composables'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { Trayek } from '@/types'
-import { Geolocation } from '@capacitor/geolocation'
+import { Dialog } from '@capacitor/dialog'
 import {
   IonBackButton,
   IonCol,
@@ -86,21 +89,7 @@ import { LineString } from 'geojson'
 import { GeolocateControl, LngLat, LngLatBounds, Map, Marker } from 'mapbox-gl'
 import { onMounted, ref } from 'vue'
 
-let map: Map
-const accessToken =
-  'pk.eyJ1Ijoid2Vsc29ub2t0YXJpbyIsImEiOiJja3liam9zNW0wZnppMnVvZGdwaW1tZDltIn0.VZSKrmUqnhui_Z4XQYrvYg'
-const isLoaded = ref(false)
-const isDark =
-  window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-const destinasi = ref({
-  trayek: '',
-  jemput: [],
-  markerJemput: undefined,
-  textJemput: '',
-  tujuan: [],
-  markerTujuan: undefined,
-  textTujuan: '',
-} as {
+type DestinasiType = {
   trayek: string
   jemput: number[]
   markerJemput: Marker | undefined
@@ -108,8 +97,25 @@ const destinasi = ref({
   tujuan: number[]
   markerTujuan: Marker | undefined
   textTujuan: string
+}
+
+let map: Map
+const accessToken = process.env.VUE_APP_MAPBOX_ACCESS_TOKEN
+const isLoaded = ref(false)
+const isDark =
+  window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+const destinasi = ref<DestinasiType>({
+  trayek: '',
+  jemput: [],
+  markerJemput: undefined,
+  textJemput: '',
+  tujuan: [],
+  markerTujuan: undefined,
+  textTujuan: '',
 })
 const cariType = ref('jemput')
+const coords = useCurrentLocation()
+const isPerjalananStarted = ref(false)
 
 onMounted(async () => {
   map = new Map({
@@ -252,10 +258,8 @@ const openModalTrayek = async () => {
   }
 }
 
-const getCurrentLocation = async () => {
-  const { coords } = await Geolocation.getCurrentPosition()
-
-  destinasi.value.jemput = [coords.longitude, coords.latitude]
+const getCurrentLocation = () => {
+  destinasi.value.jemput = [coords.value.longitude, coords.value.latitude]
 }
 
 const drawMarker = () => {
@@ -305,6 +309,28 @@ const drawTrayekLines = async () => {
   map.fitBounds(bounds, {
     padding: 32,
   })
+}
+
+const cariAngkot = async () => {
+  const modal = await modalController.create({
+    component: ModalMencari,
+  })
+
+  await modal.present()
+
+  const { data } = await modal.onDidDismiss()
+
+  data
+    ? startPerjalanan()
+    : await Dialog.alert({
+        message:
+          'Maaf, untuk sementara tidak ada angkot tersedia. Silahkan coba lagi nanti',
+      })
+}
+
+const startPerjalanan = async () => {
+  isPerjalananStarted.value = true
+  setTimeout(() => map.resize(), 100)
 }
 </script>
 

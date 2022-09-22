@@ -1,5 +1,5 @@
 <template>
-  <ion-header class="ion-no-border">
+  <ion-header v-if="!noHeader" class="ion-no-border">
     <app-bar :title="title">
       <template #start>
         <ion-buttons>
@@ -23,7 +23,7 @@
     <slot name="header" v-if="slots.header" />
   </ion-header>
 
-  <ion-content>
+  <ion-content :fullscreen="!noHeader">
     <slot name="content" />
   </ion-content>
 
@@ -52,6 +52,7 @@ defineProps({
     default: closeOutline,
   },
   endIcon: String,
+  noHeader: Boolean,
 })
 
 const emits = defineEmits<{
