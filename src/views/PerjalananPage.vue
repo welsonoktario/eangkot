@@ -1,5 +1,5 @@
 <template>
-  <app-layout>
+  <app-layout transparent>
     <template #header>
       <app-bar title="Perjalanan">
         <template #start>
@@ -86,7 +86,14 @@ import {
 import buffer from '@turf/buffer'
 import { MultiLineString } from '@turf/helpers'
 import { LineString } from 'geojson'
-import { GeolocateControl, LngLat, LngLatBounds, Map, Marker } from 'mapbox-gl'
+import {
+  GeolocateControl,
+  LngLat,
+  LngLatBounds,
+  LngLatLike,
+  Map,
+  Marker,
+} from 'mapbox-gl'
 import { onMounted, ref } from 'vue'
 
 type DestinasiType = {
@@ -201,11 +208,11 @@ const getRoute = async () => {
       //@ts-ignore
       map.getSource('route').setData(ls)
 
-      const bounds = new LngLatBounds(route[0], route[0])
+      const bounds = new LngLatBounds(ls[0], ls[0])
 
       // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
-      for (const coord of route) {
-        bounds.extend(coord)
+      for (const coord of ls.coordinates) {
+        bounds.extend(coord as LngLatLike)
       }
 
       map.fitBounds(bounds, {

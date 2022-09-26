@@ -276,3 +276,37 @@ ion-spinner {
 .font-serif {
   font-family: 'Roboto Serif';
 }
+
+.app-bar {
+  font-family: 'Roboto Serif';
+  font-weight: 600;
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  color: var(--ion-color-primary);
+  min-height: 56px;
+  padding: 8px 8px 8px 8px;
+  background: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .app-bar {
+    font-family: 'Roboto Serif';
+    font-weight: 600;
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    gap: 8px;
+    color: var(--ion-color-primary);
+    min-height: 56px;
+    padding: 8px 8px 8px 8px;
+    background: #212121;
+  }
+}
+
+.app-bar-title {
+  font-size: x-large;
+  flex: 1;
+  letter-spacing: -0.05rem;
+}
