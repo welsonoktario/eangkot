@@ -1,5 +1,5 @@
-export interface Ulasan {
-  id: number;
-  rating?: number;
-  komentar?: string;
+export type Ulasan = {
+  id: number
+  rating?: number
+  komentar?: string
 }

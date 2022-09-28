@@ -1,20 +1,20 @@
-import { Transaksi } from "./transaksi";
-import { User } from "./user";
+import { Transaksi } from './transaksi'
+import { User } from './user'
 
 export type Pesanan = {
-  id: number;
+  id: number
   jemput: {
-    lat: number[];
-    long: number[];
-  };
+    lat: number[]
+    long: number[]
+  }
   tujuan: {
-    lat: number[];
-    long: number[];
-  };
-  penumpang: number;
-  status: string;
-  tanggal: string;
-  user?: User;
-  driver?: any;
-  transaksi?: Transaksi;
-};
+    lat: number[]
+    long: number[]
+  }
+  penumpang: number
+  status: string
+  tanggal: string
+  user?: User
+  driver?: any
+  transaksi?: Transaksi
+}

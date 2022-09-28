@@ -70,8 +70,11 @@ import ModalMencari from '@/components/Perjalanan/ModalMencari.vue'
 import ModalPilihTrayek from '@/components/Perjalanan/ModalPilihTrayek.vue'
 import { useCurrentLocation } from '@/composables'
 import AppLayout from '@/layouts/AppLayout.vue'
+import { useAngkot } from '@/stores'
 import { Trayek } from '@/types'
+import { Angkot } from '@/types/angkot'
 import { Dialog } from '@capacitor/dialog'
+import { collection, Firestore, onSnapshot } from '@firebase/firestore'
 import {
   IonBackButton,
   IonCol,
@@ -94,7 +97,7 @@ import {
   Map,
   Marker,
 } from 'mapbox-gl'
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 
 type DestinasiType = {
   trayek: string
@@ -105,6 +108,10 @@ type DestinasiType = {
   markerTujuan: Marker | undefined
   textTujuan: string
 }
+
+const db: Firestore = inject('db')
+const coords = useCurrentLocation()
+const angkot = useAngkot()
 
 let map: Map
 const accessToken = process.env.VUE_APP_MAPBOX_ACCESS_TOKEN
@@ -121,7 +128,6 @@ const destinasi = ref<DestinasiType>({
   textTujuan: '',
 })
 const cariType = ref('jemput')
-const coords = useCurrentLocation()
 const isPerjalananStarted = ref(false)
 
 onMounted(async () => {
@@ -262,6 +268,7 @@ const openModalTrayek = async () => {
   if (data) {
     destinasi.value.trayek = (data as Trayek).kode
     drawTrayekLines()
+    loadAngkots()
   }
 }
 
@@ -338,6 +345,29 @@ const cariAngkot = async () => {
 const startPerjalanan = async () => {
   isPerjalananStarted.value = true
   setTimeout(() => map.resize(), 100)
+}
+
+const loadAngkots = async () => {
+  const trayek = destinasi.value.trayek
+  const docsRef = collection(db, `angkots-${trayek}`)
+
+  onSnapshot(docsRef, (snap) => {
+    const angkots = snap.docs.map((doc) => {
+      const angkot = doc.data()
+      angkot.lokasi = [angkot.lokasi.longitude, angkot.lokasi.latitude]
+
+      return angkot
+    }) as Angkot[]
+
+    angkot.setAngkots(angkots)
+    drawAngkots()
+  })
+}
+
+const drawAngkots = () => {
+  angkot.angkots.forEach((angkot) => {
+    new Marker().setLngLat(angkot.lokasi).addTo(map)
+  })
 }
 </script>
 
