@@ -74,7 +74,6 @@ import { useAngkot } from '@/stores'
 import { Trayek } from '@/types'
 import { Angkot } from '@/types/angkot'
 import { Dialog } from '@capacitor/dialog'
-import { collection, Firestore, onSnapshot } from '@firebase/firestore'
 import {
   IonBackButton,
   IonCol,
@@ -88,6 +87,7 @@ import {
 } from '@ionic/vue'
 import buffer from '@turf/buffer'
 import { MultiLineString } from '@turf/helpers'
+import { collection, Firestore, onSnapshot } from 'firebase/firestore'
 import { LineString } from 'geojson'
 import {
   GeolocateControl,
