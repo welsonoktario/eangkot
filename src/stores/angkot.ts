@@ -1,6 +1,5 @@
-import {} from '@/types'
-import { Angkot } from '@/types/angkot'
-import { LngLatLike } from 'mapbox-gl'
+import { Angkot } from '@/types'
+import { LngLatLike, Marker } from 'mapbox-gl'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 
@@ -27,13 +26,30 @@ export const useAngkot = defineStore('angkot', {
   state: () =>
     reactive({
       _angkots: [] as Angkot[],
+      _markers: [] as Marker[],
     }),
   getters: {
     angkots: (state) => state._angkots,
+    markers: (state) => state._markers,
   },
   actions: {
     setAngkots(angkots: Angkot[]) {
       this._angkots = angkots
+
+      if (this._markers.length) {
+        this._markers.forEach((marker: Marker) => {
+          marker.remove()
+        })
+      }
+
+      while (this._markers.length) {
+        this._markers.pop()
+      }
+
+      this._angkots.forEach((angkot: Angkot) => {
+        const marker = new Marker().setLngLat(angkot.lokasi)
+        this._markers.push(marker)
+      })
     },
     findAngkots(jemput: LngLatLike): Angkot[] {
       return this._angkots.sort((a: Angkot, b: Angkot) => {

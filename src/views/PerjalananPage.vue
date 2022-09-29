@@ -75,6 +75,12 @@ import { Trayek } from '@/types'
 import { Angkot } from '@/types/angkot'
 import { Dialog } from '@capacitor/dialog'
 import {
+  collection,
+  Firestore,
+  onSnapshot,
+  Unsubscribe,
+} from '@firebase/firestore'
+import {
   IonBackButton,
   IonCol,
   IonGrid,
@@ -87,7 +93,6 @@ import {
 } from '@ionic/vue'
 import buffer from '@turf/buffer'
 import { MultiLineString } from '@turf/helpers'
-import { collection, Firestore, onSnapshot } from 'firebase/firestore'
 import { LineString } from 'geojson'
 import {
   GeolocateControl,
@@ -97,7 +102,7 @@ import {
   Map,
   Marker,
 } from 'mapbox-gl'
-import { inject, onMounted, ref } from 'vue'
+import { inject, onMounted, onUnmounted, ref } from 'vue'
 
 type DestinasiType = {
   trayek: string
@@ -129,6 +134,7 @@ const destinasi = ref<DestinasiType>({
 })
 const cariType = ref('jemput')
 const isPerjalananStarted = ref(false)
+const angkotUnsubscribe = ref<Unsubscribe>()
 
 onMounted(async () => {
   map = new Map({
@@ -351,7 +357,7 @@ const loadAngkots = async () => {
   const trayek = destinasi.value.trayek
   const docsRef = collection(db, `angkots-${trayek}`)
 
-  onSnapshot(docsRef, (snap) => {
+  angkotUnsubscribe.value = onSnapshot(docsRef, (snap) => {
     const angkots = snap.docs.map((doc) => {
       const angkot = doc.data()
       angkot.lokasi = [angkot.lokasi.longitude, angkot.lokasi.latitude]
@@ -365,10 +371,12 @@ const loadAngkots = async () => {
 }
 
 const drawAngkots = () => {
-  angkot.angkots.forEach((angkot) => {
-    new Marker().setLngLat(angkot.lokasi).addTo(map)
-  })
+  angkot.markers.forEach((marker) => marker.addTo(map))
 }
+
+onUnmounted(() => {
+  angkotUnsubscribe.value()
+})
 </script>
 
 <style scoped>
