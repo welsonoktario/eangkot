@@ -26,7 +26,7 @@
               <ion-item button detail>
                 <ion-label position="floating">Pilih trayek</ion-label>
                 <ion-input
-                  v-model="destinasi.trayek"
+                  v-model="destinasi.kode"
                   readonly
                   @click="openModalTrayek()"
                 ></ion-input>
@@ -70,9 +70,8 @@ import ModalMencari from '@/components/Perjalanan/ModalMencari.vue'
 import ModalPilihTrayek from '@/components/Perjalanan/ModalPilihTrayek.vue'
 import { useCurrentLocation } from '@/composables'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { useAngkot } from '@/stores'
-import { Trayek } from '@/types'
-import { Angkot } from '@/types/angkot'
+import { useAngkot, usePerjalanan } from '@/stores'
+import { Angkot, Trayek } from '@/types'
 import { Dialog } from '@capacitor/dialog'
 import {
   collection,
@@ -105,18 +104,20 @@ import {
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
 type DestinasiType = {
-  trayek: string
-  jemput: number[]
+  trayek: Trayek | undefined
+  kode: string
+  jemput: [number, number] | undefined
+  tujuan: [number, number] | undefined
   markerJemput: Marker | undefined
-  textJemput: string
-  tujuan: number[]
   markerTujuan: Marker | undefined
+  textJemput: string
   textTujuan: string
 }
 
 const db: Firestore = inject('db')
 const coords = useCurrentLocation()
 const angkot = useAngkot()
+const perjalanan = usePerjalanan()
 
 let map: Map
 const accessToken = process.env.VUE_APP_MAPBOX_ACCESS_TOKEN
@@ -124,12 +125,13 @@ const isLoaded = ref(false)
 const isDark =
   window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 const destinasi = ref<DestinasiType>({
-  trayek: '',
-  jemput: [],
+  trayek: undefined,
+  kode: '',
+  jemput: undefined,
+  tujuan: undefined,
   markerJemput: undefined,
-  textJemput: '',
-  tujuan: [],
   markerTujuan: undefined,
+  textJemput: '',
   textTujuan: '',
 })
 const cariType = ref('jemput')
@@ -240,13 +242,13 @@ const openModal = async (title: string, type: string) => {
     componentProps: { title },
   })
 
-  modal.present()
+  await modal.present()
 
   const data = await (await modal.onDidDismiss()).data
 
   if (data) {
     if (data === 'current') {
-      await getCurrentLocation()
+      getCurrentLocation()
       drawMarker()
       destinasi.value.textJemput = 'Lokasi saat ini'
     } else if (typeof data === 'object') {
@@ -267,12 +269,13 @@ const openModalTrayek = async () => {
     component: ModalPilihTrayek,
   })
 
-  modal.present()
+  await modal.present()
 
-  const data = await (await modal.onDidDismiss()).data
+  const data: Trayek = await (await modal.onDidDismiss()).data
 
   if (data) {
-    destinasi.value.trayek = (data as Trayek).kode
+    destinasi.value.kode = data.kode
+    destinasi.value.trayek = data
     drawTrayekLines()
     loadAngkots()
   }
@@ -311,7 +314,7 @@ const drawMarker = () => {
 }
 
 const drawTrayekLines = async () => {
-  const rute = await import(`@/assets/rute-${destinasi.value.trayek}.json`)
+  const rute = await import(`@/assets/rute-${destinasi.value.kode}.json`)
 
   const buffered = buffer(rute.geometry as MultiLineString, 75, {
     units: 'meters',
@@ -322,7 +325,7 @@ const drawTrayekLines = async () => {
   map.getSource('trayek').setData(buffered)
   const bounds = new LngLatBounds()
 
-  rute.geometry.coordinates[0].forEach(function (feature) {
+  rute.geometry.coordinates[0].forEach(function (feature: any) {
     bounds.extend(feature)
   })
 
@@ -332,6 +335,11 @@ const drawTrayekLines = async () => {
 }
 
 const cariAngkot = async () => {
+  perjalanan.cariAngkot(
+    destinasi.value.trayek,
+    destinasi.value.jemput,
+    destinasi.value.tujuan
+  )
   const modal = await modalController.create({
     component: ModalMencari,
   })
@@ -344,7 +352,7 @@ const cariAngkot = async () => {
     ? startPerjalanan()
     : await Dialog.alert({
         message:
-          'Maaf, untuk sementara tidak ada angkot tersedia. Silahkan coba lagi nanti',
+          'Tidak ada angkot tersedia untuk saat ini. Silahkan coba lagi nanti',
       })
 }
 
@@ -354,8 +362,8 @@ const startPerjalanan = async () => {
 }
 
 const loadAngkots = async () => {
-  const trayek = destinasi.value.trayek
-  const docsRef = collection(db, `angkots-${trayek}`)
+  const kode = destinasi.value.kode
+  const docsRef = collection(db, `angkots-${kode}`)
 
   angkotUnsubscribe.value = onSnapshot(docsRef, (snap) => {
     const angkots = snap.docs.map((doc) => {
@@ -364,6 +372,7 @@ const loadAngkots = async () => {
 
       return angkot
     }) as Angkot[]
+    console.log(angkots)
 
     angkot.setAngkots(angkots)
     drawAngkots()
