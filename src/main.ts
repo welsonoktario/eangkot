@@ -4,7 +4,7 @@ import App from './App.vue'
 import router from './router'
 
 import { IonicVue } from '@ionic/vue'
-import { createEcho, db } from './utils'
+import { db } from './utils'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -31,7 +31,6 @@ const app = createApp(App)
   .use(IonicVue)
   .use(router)
   .use(createPinia())
-  .provide('pusher', createEcho)
   .provide('db', db)
 
 router.isReady().then(() => {

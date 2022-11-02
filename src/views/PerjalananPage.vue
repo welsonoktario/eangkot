@@ -91,8 +91,7 @@ import {
   modalController,
 } from '@ionic/vue'
 import buffer from '@turf/buffer'
-import { MultiLineString } from '@turf/helpers'
-import { LineString } from 'geojson'
+import { LineString, MultiLineString } from '@turf/helpers'
 import {
   GeolocateControl,
   LngLat,
@@ -120,7 +119,7 @@ const angkot = useAngkot()
 const perjalanan = usePerjalanan()
 
 let map: Map
-const accessToken = process.env.VUE_APP_MAPBOX_ACCESS_TOKEN
+const accessToken = import.meta.env.VITE_APP_MAPBOX_ACCESS_TOKEN
 const isLoaded = ref(false)
 const isDark =
   window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches

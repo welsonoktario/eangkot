@@ -21,7 +21,7 @@ export const usePerjalanan = defineStore('perjalanan', {
   getters: {
     angkot: (state) => state._angkot,
     driver(): User {
-      return this.angkot.driver
+      return this.angkot!.driver
     },
     trayek: (state) => state._trayek,
     jemput: (state) => state._jemput,
