@@ -26,34 +26,34 @@
   </app-layout>
 </template>
 <script lang="ts" setup>
-import AppBar from "@/components/AppBar.vue";
-import EAButton from "@/components/EAButton.vue";
-import AppLayout from "@/layouts/AppLayout.vue";
-import { useAuth } from "@/stores";
-import { User } from "@/types";
-import { Preferences } from "@capacitor/preferences";
-import { IonCol, IonGrid, IonRow, loadingController } from "@ionic/vue";
-import { onMounted, ref } from "vue";
+import AppBar from '@/components/AppBar.vue'
+import EAButton from '@/components/EAButton.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { useAuth } from '@/stores'
+import { User } from '@/types'
+import { Preferences } from '@capacitor/preferences'
+import { IonCol, IonGrid, IonRow, loadingController } from '@ionic/vue'
+import { onMounted, ref } from 'vue'
 
-const auth = useAuth();
-const user = ref<User>(null);
+const auth = useAuth()
+const user = ref<User>(null)
 
-onMounted(async () => await loadUser());
+onMounted(async () => await loadUser())
 
 const loadUser = async () => {
   const loading = await loadingController.create({
-    message: "Mohon tunggu...",
-  });
+    message: 'Mohon tunggu...',
+  })
 
-  await loading.present();
+  await loading.present()
 
-  const { value } = await Preferences.get({ key: "user" });
-  const token = await Preferences.get({ key: "token" });
-  const userJson = JSON.parse(value);
+  const { value } = await Preferences.get({ key: 'user' })
+  const token = await Preferences.get({ key: 'token' })
+  const userJson = JSON.parse(value)
 
-  user.value = userJson;
-  auth.setAuthUser(user.value, token.value);
+  user.value = userJson
+  auth.setAuthUser(user.value, token.value)
 
-  await loading.dismiss();
-};
+  await loading.dismiss()
+}
 </script>

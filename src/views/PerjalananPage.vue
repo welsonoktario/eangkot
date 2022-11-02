@@ -119,7 +119,7 @@ const angkot = useAngkot()
 const perjalanan = usePerjalanan()
 
 let map: Map
-const accessToken = import.meta.env.VITE_APP_MAPBOX_ACCESS_TOKEN
+const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
 const isLoaded = ref(false)
 const isDark =
   window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -346,6 +346,7 @@ const cariAngkot = async () => {
   await modal.present()
 
   const { data } = await modal.onDidDismiss()
+  console.log(data)
 
   data
     ? startPerjalanan()
@@ -368,6 +369,7 @@ const loadAngkots = async () => {
     const angkots = snap.docs.map((doc) => {
       const angkot = doc.data()
       angkot.lokasi = [angkot.lokasi.longitude, angkot.lokasi.latitude]
+      angkot.docId = doc.id
 
       return angkot
     }) as Angkot[]
@@ -382,9 +384,7 @@ const drawAngkots = () => {
   angkot.markers.forEach((marker) => marker.addTo(map))
 }
 
-onUnmounted(() => {
-  angkotUnsubscribe.value()
-})
+onUnmounted(() => angkotUnsubscribe.value && angkotUnsubscribe.value())
 </script>
 
 <style scoped>

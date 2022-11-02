@@ -24,13 +24,12 @@ const angkot = useAngkot()
 const perjalanan = usePerjalanan()
 const auth = useAuth()
 
-onMounted(() => {
-  console.log(perjalanan.angkot)
+onMounted(async () => {
   console.log(perjalanan.trayek)
   console.log(perjalanan.jemput)
   console.log(perjalanan.tujuan)
 
-  cariAngkot()
+  await cariAngkot()
 })
 
 const cariAngkot = async () => {
@@ -42,11 +41,12 @@ const cariAngkot = async () => {
   }
 
   perjalanan.setAngkot(nearestAngkot)
+  console.log(nearestAngkot)
 
   const docRef = doc(
     db,
     `angkots-${perjalanan.trayek.kode}`,
-    nearestAngkot.id.toString()
+    nearestAngkot.docId
   )
   const colRef = collection(docRef, 'penumpangs')
   const user = auth.authUser

@@ -1,25 +1,25 @@
 <template>
-  <IonPage>
-    <IonTabs>
-      <IonRouterOutlet></IonRouterOutlet>
-      <IonTabBar slot="bottom">
-        <IonTabButton tab="home" href="/tabs/home">
-          <IonIcon :md="home" :ios="homeOutline" />
-          <IonLabel>Home</IonLabel>
-        </IonTabButton>
+  <ion-page>
+    <ion-tabs>
+      <ion-router-outlet></ion-router-outlet>
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="home" href="/tabs/home">
+          <ion-icon :md="home" :ios="homeOutline" />
+          <ion-label>Home</ion-label>
+        </ion-tab-button>
 
-        <IonTabButton tab="riwayat" href="/tabs/riwayat">
-          <IonIcon :md="time" :ios="timeOutline" />
-          <IonLabel>Riwayat</IonLabel>
-        </IonTabButton>
+        <ion-tab-button tab="riwayat" href="/tabs/riwayat">
+          <ion-icon :md="time" :ios="timeOutline" />
+          <ion-label>Riwayat</ion-label>
+        </ion-tab-button>
 
-        <IonTabButton tab="akun" href="/tabs/akun">
-          <IonIcon :md="person" :ios="personOutline" />
-          <IonLabel>Akun</IonLabel>
-        </IonTabButton>
-      </IonTabBar>
-    </IonTabs>
-  </IonPage>
+        <ion-tab-button tab="akun" href="/tabs/akun">
+          <ion-icon :md="person" :ios="personOutline" />
+          <ion-label>Akun</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
+  </ion-page>
 </template>
 
 <script lang="ts" setup>
@@ -31,7 +31,7 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
-} from "@ionic/vue";
+} from '@ionic/vue'
 import {
   home,
   homeOutline,
@@ -39,5 +39,5 @@ import {
   personOutline,
   time,
   timeOutline,
-} from "ionicons/icons";
+} from 'ionicons/icons'
 </script>

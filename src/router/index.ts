@@ -20,17 +20,17 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'home',
         name: 'tabs.home',
-        component: () => import('../views/HomePage.vue'),
+        component: () => import('../views/Tabs/HomePage.vue'),
       },
       {
         path: 'riwayat',
         name: 'tabs.riwayat',
-        component: () => import('../views/RiwayatPage.vue'),
+        component: () => import('../views/Tabs/RiwayatPage.vue'),
       },
       {
         path: 'akun',
         name: 'tabs.akun',
-        component: () => import('../views/AkunPage.vue'),
+        component: () => import('../views/Tabs/AkunPage.vue'),
       },
     ],
   },
