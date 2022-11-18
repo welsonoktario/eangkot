@@ -198,11 +198,11 @@ onMounted(async () => {
 
   window
     .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', (event) => {
+    .addEventListener('change', (event) =>
       event.matches
         ? map.setStyle('mapbox://styles/mapbox/dark-v10')
         : map.setStyle('mapbox://styles/mapbox/light-v10')
-    })
+    )
 })
 
 const getRoute = async () => {
