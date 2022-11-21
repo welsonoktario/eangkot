@@ -1,3 +1,4 @@
+import { Driver } from './driver'
 import { Transaksi } from './transaksi'
 import { User } from './user'
 
@@ -15,6 +16,6 @@ export type Pesanan = {
   status: string
   tanggal: string
   user?: User
-  driver?: any
+  driver?: Driver
   transaksi?: Transaksi
 }

@@ -11,18 +11,18 @@
             :md="calendar"
             :ios="calendarOutline"
           ></ion-icon>
-          <ion-label>{{ pesanan.tanggal }}</ion-label>
+          <ion-label>{{ transaksi.tanggal }}</ion-label>
         </ion-item>
         <ion-item>
           <ion-icon slot="start" :md="person" :ios="personOutline"></ion-icon>
           <ion-label
-            >{{ pesanan.driver.user.nama }},
-            {{ pesanan.driver.angkot.noKendaraan }}</ion-label
+            >{{ transaksi.driver.user.nama }},
+            {{ transaksi.driver.angkot.noKendaraan }}</ion-label
           >
         </ion-item>
         <ion-item>
           <ion-icon slot="start" :md="car" :ios="carOutline"></ion-icon>
-          <ion-label>{{ pesanan.driver.angkot.trayek.kode }}</ion-label>
+          <ion-label>{{ transaksi.driver.angkot.trayek.kode }}</ion-label>
         </ion-item>
 
         <ion-list-header>
@@ -34,7 +34,7 @@
             :md="calendar"
             :ios="calendarOutline"
           ></ion-icon>
-          <ion-label>{{ pesanan.transaksi.tanggal }}</ion-label>
+          <ion-label>{{ transaksi.tanggal }}</ion-label>
         </ion-item>
         <ion-item>
           <ion-icon slot="start" :md="cash" :ios="cashOutline"></ion-icon>
@@ -46,9 +46,9 @@
         </ion-item>
         <ion-item>
           <ion-icon slot="start" :md="map" :ios="mapOutline"></ion-icon>
-          <ion-label>{{ pesanan.transaksi.jarakPerjalanan }} km</ion-label>
+          <ion-label>{{ transaksi.jarakPerjalanan }} km</ion-label>
         </ion-item>
-        <template v-if="pesanan.transaksi.ulasan">
+        <template v-if="transaksi.ulasan">
           <ion-list-header>
             <ion-label>Rating dan Komentar</ion-label>
           </ion-list-header>
@@ -57,7 +57,7 @@
             <div class="select-wrapper">
               <ion-label>Rating</ion-label>
               <ion-select
-                :selectedText="pesanan.transaksi.ulasan?.rating.toString()"
+                :selectedText="transaksi.ulasan?.rating.toString()"
                 :disabled="true"
               >
                 <ion-select-option value="1">1</ion-select-option>
@@ -74,7 +74,7 @@
               placeholder="Berikan komentar"
               :rows="3"
               :autoGrow="true"
-              :value="pesanan.transaksi.ulasan?.komentar"
+              :value="transaksi.ulasan?.komentar"
               :readonly="true"
             ></ion-textarea>
           </ion-item>
@@ -82,7 +82,7 @@
       </ion-list>
 
       <ion-modal
-        v-if="!pesanan.transaksi.ulasan"
+        v-if="!transaksi.ulasan"
         :isOpen="isModalRatingOpen"
         v-on:didDismiss="isModalRatingOpen = false"
       >
@@ -90,7 +90,7 @@
       </ion-modal>
     </template>
 
-    <template v-if="!pesanan.transaksi.ulasan" #footer>
+    <template v-if="!transaksi.ulasan" #footer>
       <e-a-button
         @click="isModalRatingOpen = true"
         class="ion-margin"
@@ -147,10 +147,10 @@ const props = defineProps({
 })
 
 const riwayat = useRiwayat()
-const pesanan = ref(riwayat.findPesanan(props.id))
-const ongkos = computed(() => rupiah(pesanan.value.transaksi.ongkos))
+const transaksi = ref(riwayat.findTransaksi(props.id))
+const ongkos = computed(() => rupiah(transaksi.value.ongkos))
 const durasi = computed(() => {
-  const d = pesanan.value.transaksi.durasiPerjalanan
+  const d = transaksi.value.durasiPerjalanan
   const h = Math.floor(d / 3600)
   const m = Math.floor((d % 3600) / 60)
   const s = Math.floor((d % 3600) % 60)

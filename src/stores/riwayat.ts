@@ -1,4 +1,4 @@
-import { Pesanan, Ulasan } from '@/types'
+import { Transaksi, Ulasan } from '@/types'
 import { get, patch } from '@/utils/http'
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
@@ -6,30 +6,28 @@ import { reactive, ref } from 'vue'
 export const useRiwayat = defineStore('riwayat', {
   state: () =>
     reactive({
-      _pesanans: [] as Pesanan[],
+      _transaksis: [] as Transaksi[],
     }),
   getters: {
-    pesanans: (state) => state._pesanans,
+    transaksis: (state) => state._transaksis,
   },
   actions: {
-    setPesanans(pesanans: Pesanan[]) {
-      this._pesanans = pesanans
+    setTransaksis(transaksis: Transaksi[]) {
+      this._transaksis = transaksis
     },
-    updatePesanan(pesanan: Pesanan) {
-      const index = this._pesanans.findIndex(
-        (p: Pesanan) => p.id === pesanan.id
-      )
-      this._pesanans[index].ulasan = pesanan.transaksi.ulasan
+    updateTransaksi(id: number, transaksi: Transaksi) {
+      const index = this._transaksis.findIndex((t: Transaksi) => t.id === id)
+      this._transaksis[index].ulasan = transaksi.ulasan
     },
-    findPesanan(id: number) {
-      return this._pesanans.find((p: Pesanan) => p.id === id) as Pesanan
+    findTransaksi(id: number) {
+      return this._transaksis.find((p: Transaksi) => p.id === id)
     },
     loadRiwayat() {
       const error = ref<any | null>(null)
       const loading = ref<boolean>(true)
 
-      get('pesanan')
-        .then((res) => (this._pesanans = res.data.data))
+      get('transaksi')
+        .then((res) => (this._transaksis = res.data.data))
         .catch((err) => (error.value = err))
         .finally(() => (loading.value = false))
 

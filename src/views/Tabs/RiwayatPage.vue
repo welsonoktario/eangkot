@@ -5,12 +5,12 @@
     </template>
 
     <template #content>
-      <ion-list v-if="riwayat.pesanans.length" lines="none" class="h-full">
+      <ion-list v-if="riwayat.transaksis.length" lines="none" class="h-full">
         <card-riwayat
-          v-for="item in riwayat.pesanans"
-          @click="detail(item.id)"
-          :transaksi="item.transaksi"
-          :key="item.id"
+          v-for="transaksi in riwayat.transaksis"
+          @click="detail(transaksi.id)"
+          :transaksi="transaksi"
+          :key="`transaksi-${transaksi.id}`"
         />
       </ion-list>
 
@@ -19,7 +19,7 @@
       </div>
 
       <ion-grid
-        v-else-if="!riwayat.pesanans.length"
+        v-else-if="!riwayat.transaksis.length"
         fixed
         style="height: 100%; display: flex; flex-flow: column"
       >
