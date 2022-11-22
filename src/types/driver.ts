@@ -1,5 +1,4 @@
-import { User } from './user'
-
 export type Driver = {
-  user: User
+  id: number
+  nama: string
 }

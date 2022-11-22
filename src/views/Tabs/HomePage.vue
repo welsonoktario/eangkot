@@ -17,7 +17,7 @@
           <ion-col>
             <h3>Mau kemana hari ini?</h3>
             <e-a-button router-link="/perjalanan" expand="block">
-              Cari Angkot
+              {{ statusPerjalanan }}
             </e-a-button>
           </ion-col>
         </ion-row>
@@ -29,14 +29,18 @@
 import AppBar from '@/components/AppBar.vue'
 import EAButton from '@/components/EAButton.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { useAuth } from '@/stores'
-import { User } from '@/types'
+import { useAuth, usePerjalanan } from '@/stores'
+import { Angkot, User } from '@/types'
 import { Preferences } from '@capacitor/preferences'
+import { doc, Firestore, getDoc } from '@firebase/firestore'
 import { IonCol, IonGrid, IonRow, loadingController } from '@ionic/vue'
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 
 const auth = useAuth()
+const perjalanan = usePerjalanan()
+const db = inject<Firestore>('db')
 const user = ref<User>(null)
+const statusPerjalanan = ref('Cari Angkot')
 
 onMounted(async () => await loadUser())
 
@@ -47,12 +51,23 @@ const loadUser = async () => {
 
   await loading.present()
 
-  const { value } = await Preferences.get({ key: 'user' })
-  const token = await Preferences.get({ key: 'token' })
-  const userJson = JSON.parse(value)
+  const { value: userPref } = await Preferences.get({ key: 'user' })
+  const { value: token } = await Preferences.get({ key: 'token' })
+  const { value: docID } = await Preferences.get({ key: 'angkot_docID' })
+  const { value: trayek } = await Preferences.get({ key: 'trayek' })
+
+  const userJson = JSON.parse(userPref)
+
+  if (docID && trayek) {
+    const angkotRef = doc(db, `angkots-${trayek}/${docID}`)
+    const angkotSnapshot = await getDoc(angkotRef)
+    perjalanan.setAngkot(angkotSnapshot.data() as Angkot)
+    perjalanan._trayek = trayek
+    statusPerjalanan.value = 'Lihat Perjalanan'
+  }
 
   user.value = userJson
-  auth.setAuthUser(user.value, token.value)
+  auth.setAuthUser(user.value, token)
 
   await loading.dismiss()
 }

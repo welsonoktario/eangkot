@@ -24,9 +24,9 @@
           detail
           button
           @click="closeModal(item)"
-          :key="item.id"
+          :key="item.place_id"
         >
-          <ion-label>{{ item.place_name }}</ion-label>
+          <ion-label>{{ item.formatted_address }}</ion-label>
         </ion-item>
       </ion-list>
     </template>
@@ -49,6 +49,7 @@ const props = defineProps({
   title: { type: String, default: 'Cari Alamat' },
 })
 
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const searchBar = ref(null)
 const query = ref('')
 const results = ref([])
@@ -60,14 +61,18 @@ const isJemput = computed(() => props.title.includes('jemput'))
 const closeModal = (data: any) => modalController.dismiss(data)
 
 const cariAlamat = async () => {
-  const q = encodeURI(query.value)
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?country=ID&region=ID-JI&access_token=pk.eyJ1Ijoid2Vsc29ub2t0YXJpbyIsImEiOiJja3liam9zNW0wZnppMnVvZGdwaW1tZDltIn0.VZSKrmUqnhui_Z4XQYrvYg`
+  if (query.value) {
+    const q = encodeURI(query.value)
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${q}&components=administrative_area:Jawa%20Timur|country:ID&key=${API_KEY}`
 
-  fetch(url)
-    .then((res) => res.json())
-    .then((data) => {
-      results.value = data.features
-    })
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        results.value = data.results
+      })
+  } else {
+    results.value = []
+  }
 }
 </script>
 

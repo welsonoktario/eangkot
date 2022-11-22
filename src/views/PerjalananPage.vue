@@ -57,6 +57,10 @@
             </ion-list>
           </ion-col>
         </ion-row>
+        <CardAngkot
+          v-else-if="isPerjalananStarted && perjalanan.angkot"
+          :angkot="perjalanan.angkot"
+        />
       </ion-grid>
     </template>
   </app-layout>
@@ -65,19 +69,25 @@
 <script lang="ts" setup>
 import AppBar from '@/components/AppBar.vue'
 import EAButton from '@/components/EAButton.vue'
+import CardAngkot from '@/components/Perjalanan/CardAngkot.vue'
 import ModalCariAlamat from '@/components/Perjalanan/ModalCariAlamat.vue'
 import ModalMencari from '@/components/Perjalanan/ModalMencari.vue'
 import ModalPilihTrayek from '@/components/Perjalanan/ModalPilihTrayek.vue'
 import { useCurrentLocation } from '@/composables'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { useAngkot, usePerjalanan } from '@/stores'
+import { useAngkot, useAuth, usePerjalanan } from '@/stores'
 import { Angkot, Trayek } from '@/types'
 import { Dialog } from '@capacitor/dialog'
+import { Preferences } from '@capacitor/preferences'
 import {
   collection,
   Firestore,
+  getDocs,
+  limit,
   onSnapshot,
+  query,
   Unsubscribe,
+  where,
 } from '@firebase/firestore'
 import {
   IonBackButton,
@@ -115,6 +125,7 @@ type DestinasiType = {
 
 const db: Firestore = inject('db')
 const coords = useCurrentLocation()
+const auth = useAuth()
 const angkot = useAngkot()
 const perjalanan = usePerjalanan()
 
@@ -203,6 +214,11 @@ onMounted(async () => {
         ? map.setStyle('mapbox://styles/mapbox/dark-v10')
         : map.setStyle('mapbox://styles/mapbox/light-v10')
     )
+
+  if (perjalanan.angkot) {
+    isPerjalananStarted.value = true
+    await loadPesanan(perjalanan.trayek as string, perjalanan.angkot.docId)
+  }
 })
 
 const getRoute = async () => {
@@ -252,11 +268,17 @@ const openModal = async (title: string, type: string) => {
       destinasi.value.textJemput = 'Lokasi saat ini'
     } else if (typeof data === 'object') {
       if (cariType.value == 'jemput') {
-        destinasi.value.jemput = data.geometry.coordinates
-        destinasi.value.textJemput = data.place_name
+        destinasi.value.jemput = [
+          data.geometry.location.lng,
+          data.geometry.location.lat,
+        ]
+        destinasi.value.textJemput = data.formatted_address
       } else {
-        destinasi.value.tujuan = data.geometry.coordinates
-        destinasi.value.textTujuan = data.place_name
+        destinasi.value.tujuan = [
+          data.geometry.location.lng,
+          data.geometry.location.lat,
+        ]
+        destinasi.value.textTujuan = data.formatted_address
       }
       drawMarker()
     }
@@ -346,7 +368,9 @@ const cariAngkot = async () => {
   await modal.present()
 
   const { data } = await modal.onDidDismiss()
-  console.log(data)
+
+  await Preferences.set({ key: 'trayek', value: destinasi.value.trayek.kode })
+  await Preferences.set({ key: 'angkot_docID', value: perjalanan.angkot.docId })
 
   data
     ? startPerjalanan()
@@ -382,6 +406,19 @@ const loadAngkots = async () => {
 
 const drawAngkots = () => {
   angkot.markers.forEach((marker) => marker.addTo(map))
+}
+
+const loadPesanan = async (trayek: string, docID: string) => {
+  try {
+    const q = query(
+      collection(db, `angkots-${trayek}/${docID}/penumpangs`),
+      where('user.id', '==', auth.authUser.id),
+      limit(1)
+    )
+    const snapshot = await getDocs(q)
+  } catch (e: any) {
+    console.log(e)
+  }
 }
 
 onUnmounted(() => angkotUnsubscribe.value && angkotUnsubscribe.value())
