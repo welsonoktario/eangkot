@@ -17,7 +17,11 @@
           <ion-col>
             <h3>Mau kemana hari ini?</h3>
             <e-a-button router-link="/perjalanan" expand="block">
-              {{ statusPerjalanan }}
+              {{
+                perjalanan.isPerjalananStarted
+                  ? 'Lihat Perjalanan'
+                  : 'Cari Angkot'
+              }}
             </e-a-button>
           </ion-col>
         </ion-row>
@@ -40,7 +44,6 @@ const auth = useAuth()
 const perjalanan = usePerjalanan()
 const db = inject<Firestore>('db')
 const user = ref<User>(null)
-const statusPerjalanan = ref('Cari Angkot')
 
 onMounted(async () => await loadUser())
 
@@ -55,15 +58,22 @@ const loadUser = async () => {
   const { value: token } = await Preferences.get({ key: 'token' })
   const { value: docID } = await Preferences.get({ key: 'angkot_docID' })
   const { value: trayek } = await Preferences.get({ key: 'trayek' })
+  const { value: jemput } = await Preferences.get({ key: 'jemput' })
+  const { value: tujuan } = await Preferences.get({ key: 'tujuan' })
 
   const userJson = JSON.parse(userPref)
 
   if (docID && trayek) {
     const angkotRef = doc(db, `angkots-${trayek}/${docID}`)
     const angkotSnapshot = await getDoc(angkotRef)
-    perjalanan.setAngkot(angkotSnapshot.data() as Angkot)
+    const data = angkotSnapshot.data()
+    data.docId = angkotSnapshot.id
+    
+    perjalanan.setAngkot(data as Angkot)
     perjalanan._trayek = trayek
-    statusPerjalanan.value = 'Lihat Perjalanan'
+    perjalanan._isPerjalananStarted = true
+    perjalanan._jemput = JSON.parse(jemput)
+    perjalanan._tujuan = JSON.parse(tujuan)
   }
 
   user.value = userJson

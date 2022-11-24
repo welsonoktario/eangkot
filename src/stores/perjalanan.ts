@@ -8,6 +8,7 @@ type PerjalananState = {
   _trayek: Trayek | string | undefined
   _jemput: LngLatLike | undefined
   _tujuan: LngLatLike | undefined
+  _isPerjalananStarted: boolean
 }
 
 export const usePerjalanan = defineStore('perjalanan', {
@@ -17,6 +18,7 @@ export const usePerjalanan = defineStore('perjalanan', {
       _trayek: undefined,
       _jemput: undefined,
       _tujuan: undefined,
+      _isPerjalananStarted: false,
     }),
   getters: {
     angkot: (state) => state._angkot,
@@ -26,6 +28,7 @@ export const usePerjalanan = defineStore('perjalanan', {
     trayek: (state) => state._trayek,
     jemput: (state) => state._jemput,
     tujuan: (state) => state._tujuan,
+    isPerjalananStarted: (state) => state._isPerjalananStarted,
   },
   actions: {
     cariAngkot(trayek: Trayek, jemput: LngLatLike, tujuan: LngLatLike) {

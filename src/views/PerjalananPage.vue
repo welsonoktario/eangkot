@@ -20,7 +20,7 @@
             ></div>
           </ion-col>
         </ion-row>
-        <ion-row v-if="!isPerjalananStarted">
+        <ion-row v-if="!perjalanan.isPerjalananStarted">
           <ion-col>
             <ion-list class="ion-padding-horizontal" inset>
               <ion-item button detail>
@@ -58,7 +58,7 @@
           </ion-col>
         </ion-row>
         <CardAngkot
-          v-else-if="isPerjalananStarted && perjalanan.angkot"
+          v-else-if="perjalanan.isPerjalananStarted && perjalanan.angkot"
           :angkot="perjalanan.angkot"
         />
       </ion-grid>
@@ -81,6 +81,7 @@ import { Dialog } from '@capacitor/dialog'
 import { Preferences } from '@capacitor/preferences'
 import {
   collection,
+  doc,
   Firestore,
   getDocs,
   limit,
@@ -145,7 +146,6 @@ const destinasi = ref<DestinasiType>({
   textTujuan: '',
 })
 const cariType = ref('jemput')
-const isPerjalananStarted = ref(false)
 const angkotUnsubscribe = ref<Unsubscribe>()
 
 onMounted(async () => {
@@ -216,8 +216,8 @@ onMounted(async () => {
     )
 
   if (perjalanan.angkot) {
-    isPerjalananStarted.value = true
     await loadPesanan(perjalanan.trayek as string, perjalanan.angkot.docId)
+    await loadPerjalanan()
   }
 })
 
@@ -342,7 +342,7 @@ const drawTrayekLines = async () => {
   })
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-ignore
+  // @ts-ignore
   map.getSource('trayek').setData(buffered)
   const bounds = new LngLatBounds()
 
@@ -369,8 +369,20 @@ const cariAngkot = async () => {
 
   const { data } = await modal.onDidDismiss()
 
+  await Preferences.remove({ key: 'trayek' })
+  await Preferences.remove({ key: 'angkot_docID' })
+  await Preferences.remove({ key: 'jemput' })
+  await Preferences.remove({ key: 'tujuan' })
   await Preferences.set({ key: 'trayek', value: destinasi.value.trayek.kode })
   await Preferences.set({ key: 'angkot_docID', value: perjalanan.angkot.docId })
+  await Preferences.set({
+    key: 'jemput',
+    value: JSON.stringify(destinasi.value.jemput),
+  })
+  await Preferences.set({
+    key: 'tujuan',
+    value: JSON.stringify(destinasi.value.tujuan),
+  })
 
   data
     ? startPerjalanan()
@@ -381,7 +393,7 @@ const cariAngkot = async () => {
 }
 
 const startPerjalanan = async () => {
-  isPerjalananStarted.value = true
+  perjalanan._isPerjalananStarted = true
   setTimeout(() => map.resize(), 100)
 }
 
@@ -419,6 +431,64 @@ const loadPesanan = async (trayek: string, docID: string) => {
   } catch (e: any) {
     console.log(e)
   }
+}
+
+const loadPerjalanan = async () => {
+  const docPath = `angkots-${perjalanan.trayek}/${perjalanan.angkot.docId}`
+  const markerJemput = new Marker().setLngLat(perjalanan.jemput).addTo(map)
+  let markerAngkot = new Marker().setLngLat([0, 0]).addTo(map)
+
+  const unsub = onSnapshot(doc(db, docPath), async (doc) => {
+    try {
+      const data = doc.data()
+      markerAngkot.setLngLat([data.lokasi.longitude, data.lokasi.latitude])
+      const jemput = markerAngkot.getLngLat().toArray().join(',')
+      const tujuan = markerJemput.getLngLat().toArray().join(',')
+
+      const res = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
+      )
+      const json = await res.json()
+      const route = json.routes[0]
+      const ls: LineString = route.geometry
+
+      if (!map.getSource('perjalanan')) {
+        map.addSource('perjalanan', {
+          type: 'geojson',
+          data: ls,
+        })
+        map.addLayer({
+          id: 'perjalanan',
+          type: 'line',
+          source: 'perjalanan',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#000',
+            'line-width': 2,
+          },
+        })
+      } else {
+        // @ts-ignore
+        map.getSource('perjalanan').setData(ls)
+      }
+
+      const bounds = new LngLatBounds(ls[0], ls[0])
+
+      // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
+      for (const coord of ls.coordinates) {
+        bounds.extend(coord as LngLatLike)
+      }
+
+      map.fitBounds(bounds, {
+        padding: 20,
+      })
+    } catch (e: any) {
+      console.error(e)
+    }
+  })
 }
 
 onUnmounted(() => angkotUnsubscribe.value && angkotUnsubscribe.value())
