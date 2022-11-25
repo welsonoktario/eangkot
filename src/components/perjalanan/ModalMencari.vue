@@ -17,34 +17,40 @@ import {
   doc,
   Firestore,
   GeoPoint,
+  onSnapshot,
+  Unsubscribe,
 } from '@firebase/firestore'
 import { modalController } from '@ionic/vue'
-import { inject, onMounted } from 'vue'
+import { inject, onMounted, ref, watch } from 'vue'
 
 const db: Firestore = inject('db')
 const angkot = useAngkot()
 const perjalanan = usePerjalanan()
 const auth = useAuth()
+const unsub = ref<Unsubscribe>()
+const isRejected = ref(false)
+const blacklist = ref<string[]>([])
 
 onMounted(async () => {
-  console.log(perjalanan.trayek)
-  console.log(perjalanan.jemput)
-  console.log(perjalanan.tujuan)
-
   await cariAngkot()
+})
+
+watch(isRejected, (next, prev) => {
+  if (next) {
+    unsub.value()
+  }
 })
 
 const cariAngkot = async () => {
   const angkots = angkot.findAngkots(perjalanan.jemput)
-  const nearestAngkot = angkots[0]
 
   if (angkots.length === 0) {
     await modalController.dismiss(false)
   }
 
+  const nearestAngkot = angkots[0]
   perjalanan.setAngkot(nearestAngkot)
-  console.log(nearestAngkot)
-
+  
   const docRef = doc(
     db,
     `angkots-${(perjalanan.trayek as Trayek).kode}`,
@@ -64,12 +70,15 @@ const cariAngkot = async () => {
     tujuan: new GeoPoint(perjalanan.tujuan[1], perjalanan.tujuan[0]),
     status: StatusPesanan.PENDING,
   })
-  console.log(pesananRef.path)
 
-  // const unsub = onSnapshot(docRef.path, async (doc) => {
-
-  // })
-
-  // await modalController.dismiss(true)
+  unsub.value = onSnapshot(pesananRef, async (doc) => {
+    const data = doc.data()
+    if (data.status === StatusPesanan.ACCEPT) {
+      await modalController.dismiss(true)
+    } else if (data.status === StatusPesanan.CANCEL) {
+      blacklist.value.push(nearestAngkot.docId)
+      cariAngkot()
+    }
+  })
 }
 </script>
