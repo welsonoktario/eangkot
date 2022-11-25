@@ -51,19 +51,21 @@ export const useAngkot = defineStore('angkot', {
         this._markers.push(marker)
       })
     },
-    findAngkots(jemput: LngLatLike): Angkot[] {
-      return this._angkots.sort((a: Angkot, b: Angkot) => {
-        const distA = calcCrow(jemput, a.lokasi)
-        const distB = calcCrow(jemput, b.lokasi)
+    findAngkots(jemput: LngLatLike, blacklist: string[] = []): Angkot[] {
+      return this._angkots
+        .filter((angkot: Angkot) => !blacklist.includes(angkot.docId))
+        .sort((a: Angkot, b: Angkot) => {
+          const distA = calcCrow(jemput, a.lokasi)
+          const distB = calcCrow(jemput, b.lokasi)
 
-        if (distA < distB) {
-          return -1
-        }
-        if (distA > distB) {
-          return 1
-        }
-        return 0
-      })
+          if (distA < distB) {
+            return -1
+          }
+          if (distA > distB) {
+            return 1
+          }
+          return 0
+        })
     },
   },
 })

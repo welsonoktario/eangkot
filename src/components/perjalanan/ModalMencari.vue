@@ -9,6 +9,8 @@
 <script lang="ts" setup>
 import ModalLayout from '@/components/ModalLayout.vue'
 import { useAngkot, useAuth, usePerjalanan } from '@/stores'
+import { Trayek } from '@/types'
+import { StatusPesanan } from '@/types/statusEnum'
 import {
   addDoc,
   collection,
@@ -45,13 +47,13 @@ const cariAngkot = async () => {
 
   const docRef = doc(
     db,
-    `angkots-${perjalanan.trayek.kode}`,
+    `angkots-${(perjalanan.trayek as Trayek).kode}`,
     nearestAngkot.docId
   )
   const colRef = collection(docRef, 'penumpangs')
   const user = auth.authUser
 
-  await addDoc(colRef, {
+  const pesananRef = await addDoc(colRef, {
     user: {
       id: user.id,
       nama: user.nama,
@@ -60,9 +62,14 @@ const cariAngkot = async () => {
     },
     jemput: new GeoPoint(perjalanan.jemput[1], perjalanan.jemput[0]),
     tujuan: new GeoPoint(perjalanan.tujuan[1], perjalanan.tujuan[0]),
-    status: 'pending',
+    status: StatusPesanan.PENDING,
   })
+  console.log(pesananRef.path)
 
-  await modalController.dismiss(true)
+  // const unsub = onSnapshot(docRef.path, async (doc) => {
+
+  // })
+
+  // await modalController.dismiss(true)
 }
 </script>
