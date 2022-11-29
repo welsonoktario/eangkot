@@ -77,13 +77,13 @@ import { useCurrentLocation } from '@/composables'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useAngkot, useAuth, usePerjalanan } from '@/stores'
 import { Angkot, Trayek } from '@/types'
+import { StatusPesanan } from '@/types/statusEnum'
 import { Dialog } from '@capacitor/dialog'
+import { Geolocation } from '@capacitor/geolocation'
 import { Preferences } from '@capacitor/preferences'
 import {
   collection,
-  doc,
   Firestore,
-  getDocs,
   limit,
   onSnapshot,
   query,
@@ -147,6 +147,7 @@ const destinasi = ref<DestinasiType>({
 })
 const cariType = ref('jemput')
 const angkotUnsubscribe = ref<Unsubscribe>()
+const perjalananUnsubscribe = ref<Unsubscribe>()
 
 onMounted(async () => {
   map = new Map({
@@ -217,7 +218,6 @@ onMounted(async () => {
 
   if (perjalanan.angkot) {
     await loadPesanan(perjalanan.trayek as string, perjalanan.angkot.docId)
-    await loadPerjalanan()
   }
 })
 
@@ -427,23 +427,101 @@ const loadPesanan = async (trayek: string, docID: string) => {
       where('user.id', '==', auth.authUser.id),
       limit(1)
     )
-    const snapshot = await getDocs(q)
+    const unsub = onSnapshot(q, async (docs) => {
+      const data = docs.docs[0].data()
+
+      if (data.status == StatusPesanan.ACCEPT) {
+        await pesananDiterima(data)
+      } else if (data.status == StatusPesanan.PROCESS) {
+        await pesananDiproses(data)
+      }
+      if (data.status == StatusPesanan.DONE) {
+        unsub()
+        alert('done')
+      }
+    })
   } catch (e: any) {
     console.log(e)
   }
 }
 
-const loadPerjalanan = async () => {
-  const docPath = `angkots-${perjalanan.trayek}/${perjalanan.angkot.docId}`
-  const markerJemput = new Marker().setLngLat(perjalanan.jemput).addTo(map)
-  let markerAngkot = new Marker().setLngLat([0, 0]).addTo(map)
+const pesananDiterima = async (data: any) => {
+  destinasi.value.markerJemput = new Marker()
+    .setLngLat(perjalanan.jemput)
+    .addTo(map)
+  destinasi.value.markerTujuan = new Marker().setLngLat([0, 0]).addTo(map)
 
-  const unsub = onSnapshot(doc(db, docPath), async (doc) => {
-    try {
-      const data = doc.data()
-      markerAngkot.setLngLat([data.lokasi.longitude, data.lokasi.latitude])
-      const jemput = markerAngkot.getLngLat().toArray().join(',')
-      const tujuan = markerJemput.getLngLat().toArray().join(',')
+  destinasi.value.markerTujuan.setLngLat([
+    data.jemput.longitude,
+    data.jemput.latitude,
+  ])
+  const jemput = destinasi.value.markerJemput.getLngLat().toArray().join(',')
+  const tujuan = destinasi.value.markerTujuan.getLngLat().toArray().join(',')
+
+  const res = await fetch(
+    `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
+  )
+  const json = await res.json()
+  const route = json.routes[0]
+  const ls: LineString = route.geometry
+
+  if (!map.getSource('perjalanan')) {
+    map.addSource('perjalanan', {
+      type: 'geojson',
+      data: ls,
+    })
+    map.addLayer({
+      id: 'perjalanan',
+      type: 'line',
+      source: 'perjalanan',
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round',
+      },
+      paint: {
+        'line-color': '#000',
+        'line-width': 2,
+      },
+    })
+  } else {
+    // @ts-ignore
+    map.getSource('perjalanan').setData(ls)
+  }
+
+  const bounds = new LngLatBounds(ls[0], ls[0])
+
+  // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
+  for (const coord of ls.coordinates) {
+    bounds.extend(coord as LngLatLike)
+  }
+
+  map.fitBounds(bounds, {
+    padding: 20,
+  })
+}
+
+const pesananDiproses = async (data: any) => {
+  destinasi.value.markerTujuan = new Marker()
+    .setLngLat([data.tujuan.longitude, data.tujuan.latitude])
+    .addTo(map)
+  destinasi.value.markerJemput = new Marker().setLngLat([0, 0]).addTo(map)
+
+  await Geolocation.watchPosition(
+    { enableHighAccuracy: true, timeout: 3000 },
+    async (pos) => {
+      const coords = pos.coords
+      destinasi.value.markerJemput.setLngLat([
+        coords.longitude,
+        coords.latitude,
+      ])
+      const jemput = destinasi.value.markerJemput
+        .getLngLat()
+        .toArray()
+        .join(',')
+      const tujuan = destinasi.value.markerTujuan
+        .getLngLat()
+        .toArray()
+        .join(',')
 
       const res = await fetch(
         `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
@@ -485,13 +563,14 @@ const loadPerjalanan = async () => {
       map.fitBounds(bounds, {
         padding: 20,
       })
-    } catch (e: any) {
-      console.error(e)
     }
-  })
+  )
 }
 
-onUnmounted(() => angkotUnsubscribe.value && angkotUnsubscribe.value())
+onUnmounted(() => {
+  angkotUnsubscribe.value && angkotUnsubscribe.value()
+  perjalananUnsubscribe.value && perjalananUnsubscribe.value()
+})
 </script>
 
 <style scoped>
