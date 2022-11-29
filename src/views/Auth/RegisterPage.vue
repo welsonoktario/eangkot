@@ -1,11 +1,13 @@
 <template>
   <AppLayout>
     <template #header>
-      <IonButtons slot="start">
-        <IonBackButton></IonBackButton>
-      </IonButtons>
-
-      <IonTitle>Register</IonTitle>
+      <AppBar title="Riwayat">
+        <template #start>
+          <ion-buttons>
+            <ion-back-button></ion-back-button>
+          </ion-buttons>
+        </template>
+      </AppBar>
     </template>
 
     <template #content>
@@ -37,9 +39,10 @@
 </template>
 
 <script lang="ts" setup>
-import AppLayout from "@/layouts/AppLayout.vue";
-import { User } from "@/types/user";
-import { useAuth } from "@/stores/auth";
+import AppBar from '@/components/AppBar.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { useAuth } from '@/stores/auth'
+import { User } from '@/types/user'
 import {
   IonBackButton,
   IonButton,
@@ -48,26 +51,25 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonTitle,
   useIonRouter,
-} from "@ionic/vue";
-import { ref } from "vue";
-import { useRoute } from "vue-router";
+} from '@ionic/vue'
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
-const ionRouter = useIonRouter();
-const auth = useAuth();
+const route = useRoute()
+const ionRouter = useIonRouter()
+const auth = useAuth()
 
-const { phone } = route.params;
-const nama = ref("");
+const { phone } = route.params
+const nama = ref('')
 
 const register = async () => {
-  const res = await auth.register(nama.value, phone.toString());
-  const data = await res.data;
+  const res = await auth.register(nama.value, phone.toString())
+  const data = await res.data
 
-  if (data.status == "OK") {
-    await auth.setAuthUser(data.data.user as User, data.data.token);
-    ionRouter.push("/tabs/home");
+  if (data.status == 'OK') {
+    await auth.setAuthUser(data.data.user as User, data.data.token)
+    ionRouter.push('/tabs/home')
   }
-};
+}
 </script>

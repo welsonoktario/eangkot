@@ -1,4 +1,4 @@
-import { get } from "@/utils/http";
+import { get } from "@/lib/http";
 import { ref } from "vue";
 
 export const useGet = <T>(url: string) => {

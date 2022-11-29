@@ -1,5 +1,5 @@
+import { get, patch } from '@/lib'
 import { Transaksi, Ulasan } from '@/types'
-import { get, patch } from '@/utils/http'
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 
