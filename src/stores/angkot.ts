@@ -67,5 +67,12 @@ export const useAngkot = defineStore('angkot', {
           return 0
         })
     },
+    removeMarkers() {
+      if (this._markers.length) {
+        this._markers.forEach((marker: Marker) => {
+          marker.remove()
+        })
+      }
+    },
   },
 })

@@ -56,24 +56,22 @@ const loadUser = async () => {
 
   const { value: userPref } = await Preferences.get({ key: 'user' })
   const { value: token } = await Preferences.get({ key: 'token' })
-  const { value: docID } = await Preferences.get({ key: 'angkot_docID' })
-  const { value: trayek } = await Preferences.get({ key: 'trayek' })
-  const { value: jemput } = await Preferences.get({ key: 'jemput' })
-  const { value: tujuan } = await Preferences.get({ key: 'tujuan' })
 
   const userJson = JSON.parse(userPref)
 
-  if (docID && trayek) {
-    const angkotRef = doc(db, `angkots-${trayek}/${docID}`)
+  if (perjalanan.angkot?.docId && perjalanan.trayek) {
+    const angkotRef = doc(
+      db,
+      `angkots-${perjalanan.trayek}/${perjalanan.angkot.docId}`
+    )
     const angkotSnapshot = await getDoc(angkotRef)
-    const data = angkotSnapshot.data()
-    data.docId = angkotSnapshot.id
-    
-    perjalanan.setAngkot(data as Angkot)
-    perjalanan._trayek = trayek
-    perjalanan._isPerjalananStarted = true
-    perjalanan._jemput = JSON.parse(jemput)
-    perjalanan._tujuan = JSON.parse(tujuan)
+
+    if (angkotSnapshot.exists()) {
+      const data = angkotSnapshot.data()
+      data.docId = angkotSnapshot.id
+
+      perjalanan.setAngkot(data as Angkot)
+    }
   }
 
   user.value = userJson

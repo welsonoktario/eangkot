@@ -136,6 +136,7 @@ const router = useIonRouter()
 
 let map: Map
 const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const isLoaded = ref(false)
 const isDark =
   window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -223,7 +224,7 @@ onMounted(async () => {
     )
 
   if (perjalanan.angkot) {
-    await loadPesanan(perjalanan.trayek as string, perjalanan.angkot.docId)
+    await loadPesanan(perjalanan.trayek.kode, perjalanan.angkot.docId)
   }
 })
 
@@ -256,6 +257,18 @@ const getRoute = async () => {
     })
 }
 
+const fetchAddres = async (lngLat: LngLatLike) => {
+  try {
+    const latLng = (lngLat as number[]).slice().reverse().join(',')
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latLng}&key=${apiKey}`
+    )
+    return await res.json()
+  } catch (e: any) {
+    console.error('[fetchAddress] Error fetching address: ', e)
+  }
+}
+
 const openModal = async (title: string, type: string) => {
   cariType.value = type
   const modal = await modalController.create({
@@ -272,6 +285,9 @@ const openModal = async (title: string, type: string) => {
       getCurrentLocation()
       drawMarker()
       destinasi.value.textJemput = 'Lokasi saat ini'
+      fetchAddres(destinasi.value.jemput).then(
+        (res) => (perjalanan._jemputStr = res.results[0].formatted_address)
+      )
     } else if (typeof data === 'object') {
       if (cariType.value == 'jemput') {
         destinasi.value.jemput = [
@@ -279,12 +295,14 @@ const openModal = async (title: string, type: string) => {
           data.geometry.location.lat,
         ]
         destinasi.value.textJemput = data.formatted_address
+        perjalanan._jemputStr = data.formatted_address
       } else {
         destinasi.value.tujuan = [
           data.geometry.location.lng,
           data.geometry.location.lat,
         ]
         destinasi.value.textTujuan = data.formatted_address
+        perjalanan._tujuanStr = data.formatted_address
       }
       drawMarker()
     }
@@ -376,7 +394,10 @@ const cariAngkot = async () => {
   const { data } = await modal.onDidDismiss()
 
   data
-    ? setTimeout(() => map.resize(), 100)
+    ? setTimeout(() => {
+        map.resize()
+        loadPesanan(perjalanan.trayek.kode, perjalanan.angkot.docId)
+      }, 100)
     : await Dialog.alert({
         message:
           'Tidak ada angkot tersedia untuk saat ini. Silahkan coba lagi nanti',
@@ -407,6 +428,15 @@ const drawAngkots = () => {
 
 const loadPesanan = async (trayek: string, docID: string) => {
   try {
+    if (map.getLayer('trayek')) {
+      map.removeLayer('trayek')
+    }
+
+    if (angkotUnsubscribe.value) {
+      angkotUnsubscribe.value()
+      angkot.removeMarkers()
+    }
+
     const q = query(
       collection(db, `angkots-${trayek}/${docID}/penumpangs`),
       where('user.id', '==', auth.authUser.id),
@@ -423,10 +453,11 @@ const loadPesanan = async (trayek: string, docID: string) => {
         await Geolocation.clearWatch({
           id: locationWatcher.value,
         })
-        unsub()
         if (jemputUnsubscriber.value) {
           jemputUnsubscriber.value()
         }
+        perjalanan.$reset()
+        unsub()
         alert('done')
       }
     })
@@ -554,15 +585,15 @@ const setOrUpdateLayer = (geom: any) => {
 const addTransaksi = async () => {
   try {
     const data: AddTransaksi = {
-    user: auth.authUser.id,
-    driver: perjalanan.angkot.driver.id,
-    durasiPerjalanan: 0,
-    jarakPerjalanan: 0,
-    ongkos: 0,
-    lokasiJemput: 'abc',
-    lokasiTujuan: 'cba'
-  }
-  const res = await riwayat.addTransaksi(data)
+      user: auth.authUser.id,
+      driver: perjalanan.angkot.driver.id,
+      durasiPerjalanan: 0,
+      jarakPerjalanan: 0,
+      ongkos: 0,
+      lokasiJemput: 'abc',
+      lokasiTujuan: 'cba',
+    }
+    const res = await riwayat.addTransaksi(data)
   } catch (e: any) {
     console.error(e)
   }

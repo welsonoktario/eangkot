@@ -5,7 +5,7 @@ import { reactive } from 'vue'
 
 type PerjalananState = {
   _angkot: Angkot | undefined
-  _trayek: Trayek | string | undefined
+  _trayek: Trayek | undefined
   _jemput: LngLatLike | undefined
   _jemputStr: string
   _tujuan: LngLatLike | undefined

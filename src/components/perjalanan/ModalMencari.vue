@@ -11,7 +11,6 @@ import ModalLayout from '@/components/ModalLayout.vue'
 import { useAngkot, useAuth, usePerjalanan } from '@/stores'
 import { Trayek } from '@/types'
 import { StatusPesanan } from '@/types/statusEnum'
-import { Preferences } from '@capacitor/preferences'
 import {
   addDoc,
   collection,
@@ -75,27 +74,8 @@ const cariAngkot = async () => {
     const data = doc.data()
     if (data.status === StatusPesanan.ACCEPT) {
       unsub.value()
-      await Preferences.remove({ key: 'trayek' })
-      await Preferences.remove({ key: 'angkot_docID' })
-      await Preferences.remove({ key: 'jemput' })
-      await Preferences.remove({ key: 'tujuan' })
-      await Preferences.set({
-        key: 'trayek',
-        value: (perjalanan.trayek as Trayek).kode,
-      })
-      await Preferences.set({
-        key: 'angkot_docID',
-        value: nearestAngkot.docId,
-      })
-      await Preferences.set({
-        key: 'jemput',
-        value: JSON.stringify(perjalanan.jemput),
-      })
-      await Preferences.set({
-        key: 'tujuan',
-        value: JSON.stringify(perjalanan.tujuan),
-      })
 
+      perjalanan.setAngkot(nearestAngkot)
       perjalanan._isPerjalananStarted = true
 
       await modalController.dismiss(true)
