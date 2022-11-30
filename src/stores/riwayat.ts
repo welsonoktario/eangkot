@@ -1,5 +1,5 @@
-import { get, patch } from '@/lib'
-import { Transaksi, Ulasan } from '@/types'
+import { get, patch, post } from '@/lib'
+import { AddTransaksi, Transaksi, Ulasan } from '@/types'
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 
@@ -35,6 +35,9 @@ export const useRiwayat = defineStore('riwayat', {
     },
     async addUlasan(id: number, ulasan: Ulasan) {
       return await patch(`transaksi/${id}`, ulasan)
+    },
+    async addTransaksi(transaksi: AddTransaksi) {
+      return await post('transaksi', transaksi)
     },
   },
 })

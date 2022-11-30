@@ -1,29 +1,29 @@
 <template>
   <modal-layout title="Beri Ulasan" @start-click="back()">
     <template #content>
-      <IonList>
-        <IonItem class="item-input">
-          <IonIcon slot="start" :md="star" :ios="starOutline"></IonIcon>
+      <ion-list>
+        <ion-item class="item-input">
+          <ion-icon slot="start" :md="star" :ios="starOutline"></ion-icon>
           <div class="select-wrapper">
-            <IonLabel>Rating</IonLabel>
-            <IonSelect v-model="ulasan.rating">
-              <IonSelectOption value="1">1</IonSelectOption>
-              <IonSelectOption value="2">2</IonSelectOption>
-              <IonSelectOption value="3">3</IonSelectOption>
-              <IonSelectOption value="4">4</IonSelectOption>
-              <IonSelectOption value="5">5</IonSelectOption>
-            </IonSelect>
+            <ion-label>Rating</ion-label>
+            <ion-select v-model="ulasan.rating">
+              <ion-select-option value="1">1</ion-select-option>
+              <ion-select-option value="2">2</ion-select-option>
+              <ion-select-option value="3">3</ion-select-option>
+              <ion-select-option value="4">4</ion-select-option>
+              <ion-select-option value="5">5</ion-select-option>
+            </ion-select>
           </div>
-        </IonItem>
-        <IonItem class="ion-margin-bottom item-input">
-          <IonLabel position="stacked">Komentar</IonLabel>
-          <IonTextarea
+        </ion-item>
+        <ion-item class="ion-margin-bottom item-input">
+          <ion-label position="stacked">Komentar</ion-label>
+          <ion-textarea
             v-model="ulasan.komentar"
             placeholder="Berikan komentar"
             :rows="3"
-          ></IonTextarea>
-        </IonItem>
-      </IonList>
+          ></ion-textarea>
+        </ion-item>
+      </ion-list>
     </template>
 
     <template #footer>
@@ -75,7 +75,7 @@ const ulasan = ref<Ulasan>({
 const back = async () => await modalController.dismiss();
 
 const addUlasan = async () => {
-  const transaksi = riwayat.findPesanan(props.id).transaksi;
+  const transaksi = riwayat.findTransaksi(props.id);
   const res = await riwayat.addUlasan(props.id, ulasan.value);
   const { data, status } = res;
 

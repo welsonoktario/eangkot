@@ -5,6 +5,7 @@ import router from './router'
 
 import { db } from '@/lib'
 import { IonicVue } from '@ionic/vue'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -27,10 +28,13 @@ import './theme/variables.scss'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
 const app = createApp(App)
   .use(IonicVue)
   .use(router)
-  .use(createPinia())
+  .use(pinia)
   .provide('db', db)
 
 router.isReady().then(() => {

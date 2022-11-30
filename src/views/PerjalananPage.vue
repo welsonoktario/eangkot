@@ -73,14 +73,14 @@ import CardAngkot from '@/components/Perjalanan/CardAngkot.vue'
 import ModalCariAlamat from '@/components/Perjalanan/ModalCariAlamat.vue'
 import ModalMencari from '@/components/Perjalanan/ModalMencari.vue'
 import ModalPilihTrayek from '@/components/Perjalanan/ModalPilihTrayek.vue'
+import ModalRating from '@/components/Riwayat/ModalRating.vue'
 import { useCurrentLocation } from '@/composables'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { useAngkot, useAuth, usePerjalanan } from '@/stores'
-import { Angkot, Trayek } from '@/types'
+import { useAngkot, useAuth, usePerjalanan, useRiwayat } from '@/stores'
+import { AddTransaksi, Angkot, Trayek } from '@/types'
 import { StatusPesanan } from '@/types/statusEnum'
 import { Dialog } from '@capacitor/dialog'
 import { Geolocation } from '@capacitor/geolocation'
-import { Preferences } from '@capacitor/preferences'
 import {
   collection,
   doc,
@@ -101,6 +101,7 @@ import {
   IonList,
   IonRow,
   modalController,
+  useIonRouter,
 } from '@ionic/vue'
 import buffer from '@turf/buffer'
 import { LineString, MultiLineString } from '@turf/helpers'
@@ -130,6 +131,8 @@ const coords = useCurrentLocation()
 const auth = useAuth()
 const angkot = useAngkot()
 const perjalanan = usePerjalanan()
+const riwayat = useRiwayat()
+const router = useIonRouter()
 
 let map: Map
 const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
@@ -372,32 +375,12 @@ const cariAngkot = async () => {
 
   const { data } = await modal.onDidDismiss()
 
-  await Preferences.remove({ key: 'trayek' })
-  await Preferences.remove({ key: 'angkot_docID' })
-  await Preferences.remove({ key: 'jemput' })
-  await Preferences.remove({ key: 'tujuan' })
-  await Preferences.set({ key: 'trayek', value: destinasi.value.trayek.kode })
-  await Preferences.set({ key: 'angkot_docID', value: perjalanan.angkot.docId })
-  await Preferences.set({
-    key: 'jemput',
-    value: JSON.stringify(destinasi.value.jemput),
-  })
-  await Preferences.set({
-    key: 'tujuan',
-    value: JSON.stringify(destinasi.value.tujuan),
-  })
-
   data
-    ? startPerjalanan()
+    ? setTimeout(() => map.resize(), 100)
     : await Dialog.alert({
         message:
           'Tidak ada angkot tersedia untuk saat ini. Silahkan coba lagi nanti',
       })
-}
-
-const startPerjalanan = async () => {
-  perjalanan._isPerjalananStarted = true
-  setTimeout(() => map.resize(), 100)
 }
 
 const loadAngkots = async () => {
@@ -441,7 +424,9 @@ const loadPesanan = async (trayek: string, docID: string) => {
           id: locationWatcher.value,
         })
         unsub()
-        jemputUnsubscriber.value()
+        if (jemputUnsubscriber.value) {
+          jemputUnsubscriber.value()
+        }
         alert('done')
       }
     })
@@ -476,56 +461,10 @@ const pesananDiterima = async (data: any) => {
           .setLngLat(perjalanan.jemput)
           .addTo(map)
       }
-      const jemput = destinasi.value.markerJemput
-        .getLngLat()
-        .toArray()
-        .join(',')
-      const tujuan = destinasi.value.markerTujuan
-        .getLngLat()
-        .toArray()
-        .join(',')
 
-      const res = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
-      )
-      const json = await res.json()
-      const route = json.routes[0]
-      const ls: LineString = route.geometry
-
-      if (!map.getSource('perjalanan')) {
-        map.addSource('perjalanan', {
-          type: 'geojson',
-          data: ls,
-        })
-        map.addLayer({
-          id: 'perjalanan',
-          type: 'line',
-          source: 'perjalanan',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-          },
-          paint: {
-            'line-color': '#000',
-            'line-width': 2,
-          },
-        })
-      } else {
-        // @ts-ignore
-        map.getSource('perjalanan').setData(ls)
-      }
-
-      const bounds = new LngLatBounds(ls[0], ls[0])
-
-      // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
-      for (const coord of ls.coordinates) {
-        bounds.extend(coord as LngLatLike)
-      }
-
-      map.fitBounds(bounds, {
-        padding: 64,
-      })
+      fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
     })
+  } else {
   }
 }
 
@@ -555,58 +494,88 @@ const pesananDiproses = async (data: any) => {
           coords.longitude,
           coords.latitude,
         ])
-        const jemput = destinasi.value.markerJemput
-          .getLngLat()
-          .toArray()
-          .join(',')
-        const tujuan = destinasi.value.markerTujuan
-          .getLngLat()
-          .toArray()
-          .join(',')
 
-        const res = await fetch(
-          `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
-        )
-        const json = await res.json()
-        const route = json.routes[0]
-        const ls: LineString = route.geometry
-
-        if (!map.getSource('perjalanan')) {
-          map.addSource('perjalanan', {
-            type: 'geojson',
-            data: ls,
-          })
-          map.addLayer({
-            id: 'perjalanan',
-            type: 'line',
-            source: 'perjalanan',
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round',
-            },
-            paint: {
-              'line-color': '#000',
-              'line-width': 2,
-            },
-          })
-        } else {
-          // @ts-ignore
-          map.getSource('perjalanan').setData(ls)
-        }
-
-        const bounds = new LngLatBounds(ls[0], ls[0])
-
-        // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
-        for (const coord of ls.coordinates) {
-          bounds.extend(coord as LngLatLike)
-        }
-
-        map.fitBounds(bounds, {
-          padding: 20,
-        })
+        fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
       }
     )
   }
+}
+
+const fetchRoute = async (jemput: Marker, tujuan: Marker) => {
+  const jemputStr = jemput.getLngLat().toArray().join(',')
+  const tujuanStr = tujuan.getLngLat().toArray().join(',')
+
+  const res = await fetch(
+    `https://api.mapbox.com/directions/v5/mapbox/driving/${jemputStr};${tujuanStr}?geometries=geojson&access_token=${accessToken}`
+  )
+  const json = await res.json()
+  const route = json.routes[0]
+  const ls: LineString = route.geometry
+
+  setOrUpdateLayer(ls)
+}
+
+const setOrUpdateLayer = (geom: any) => {
+  if (!map.getSource('perjalanan')) {
+    map.addSource('perjalanan', {
+      type: 'geojson',
+      data: geom,
+    })
+    map.addLayer({
+      id: 'perjalanan',
+      type: 'line',
+      source: 'perjalanan',
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round',
+      },
+      paint: {
+        'line-color': '#000',
+        'line-width': 2,
+      },
+    })
+  } else {
+    // @ts-ignore
+    map.getSource('perjalanan').setData(geom)
+  }
+
+  const bounds = new LngLatBounds(geom[0], geom[0])
+
+  // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
+  for (const coord of geom.coordinates) {
+    bounds.extend(coord as LngLatLike)
+  }
+
+  map.fitBounds(bounds, {
+    padding: 20,
+  })
+}
+
+const addTransaksi = async () => {
+  try {
+    const data: AddTransaksi = {
+    user: auth.authUser.id,
+    driver: perjalanan.angkot.driver.id,
+    durasiPerjalanan: 0,
+    jarakPerjalanan: 0,
+    ongkos: 0,
+    lokasiJemput: 'abc',
+    lokasiTujuan: 'cba'
+  }
+  const res = await riwayat.addTransaksi(data)
+  } catch (e: any) {
+    console.error(e)
+  }
+}
+
+const openModalRating = async (id: number) => {
+  const modal = await modalController.create({
+    component: ModalRating,
+    componentProps: { id },
+  })
+
+  modal.present()
+  router.back()
 }
 
 onUnmounted(() => {

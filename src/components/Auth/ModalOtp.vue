@@ -1,16 +1,5 @@
 <template>
-  <app-layout>
-    <template #header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button @click="closeModal(null)">
-            <ion-icon slot="icon-only" :icon="arrowBack"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-        <ion-title>OTP</ion-title>
-      </ion-toolbar>
-    </template>
-
+  <ModalLayout title="Verifikasi Kode OTP" @start-click="closeModal(null)">
     <template #content>
       <ion-label>Kode OTP</ion-label>
       <div style="display: flex; flex-direction: row; width: 100%">
@@ -31,7 +20,7 @@
         Lanjut
       </ion-button>
     </template>
-  </app-layout>
+  </ModalLayout>
 </template>
 
 <script lang="ts" setup>
@@ -50,6 +39,7 @@ import {
 import { arrowBack } from "ionicons/icons";
 import { onMounted, ref } from "vue";
 import VOtpInput from "vue3-otp-input";
+import ModalLayout from "../ModalLayout.vue";
 
 const auth = useAuth();
 

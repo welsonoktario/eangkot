@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <template #header>
-      <AppBar title="Riwayat">
+      <AppBar title="Daftar Akun">
         <template #start>
           <ion-buttons>
             <ion-back-button></ion-back-button>

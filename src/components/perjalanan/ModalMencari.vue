@@ -11,6 +11,7 @@ import ModalLayout from '@/components/ModalLayout.vue'
 import { useAngkot, useAuth, usePerjalanan } from '@/stores'
 import { Trayek } from '@/types'
 import { StatusPesanan } from '@/types/statusEnum'
+import { Preferences } from '@capacitor/preferences'
 import {
   addDoc,
   collection,
@@ -49,8 +50,7 @@ const cariAngkot = async () => {
   }
 
   const nearestAngkot = angkots[0]
-  perjalanan.setAngkot(nearestAngkot)
-  
+
   const docRef = doc(
     db,
     `angkots-${(perjalanan.trayek as Trayek).kode}`,
@@ -74,6 +74,30 @@ const cariAngkot = async () => {
   unsub.value = onSnapshot(pesananRef, async (doc) => {
     const data = doc.data()
     if (data.status === StatusPesanan.ACCEPT) {
+      unsub.value()
+      await Preferences.remove({ key: 'trayek' })
+      await Preferences.remove({ key: 'angkot_docID' })
+      await Preferences.remove({ key: 'jemput' })
+      await Preferences.remove({ key: 'tujuan' })
+      await Preferences.set({
+        key: 'trayek',
+        value: (perjalanan.trayek as Trayek).kode,
+      })
+      await Preferences.set({
+        key: 'angkot_docID',
+        value: nearestAngkot.docId,
+      })
+      await Preferences.set({
+        key: 'jemput',
+        value: JSON.stringify(perjalanan.jemput),
+      })
+      await Preferences.set({
+        key: 'tujuan',
+        value: JSON.stringify(perjalanan.tujuan),
+      })
+
+      perjalanan._isPerjalananStarted = true
+
       await modalController.dismiss(true)
     } else if (data.status === StatusPesanan.CANCEL) {
       blacklist.value.push(nearestAngkot.docId)

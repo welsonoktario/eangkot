@@ -14,3 +14,13 @@ export type Transaksi = {
   angkot: Angkot
   ulasan?: Ulasan
 }
+
+export type AddTransaksi = {
+  user: number
+  driver: number
+  ongkos: number
+  durasiPerjalanan: number
+  jarakPerjalanan: number
+  lokasiJemput: string
+  lokasiTujuan: string
+}
