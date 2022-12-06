@@ -79,7 +79,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { useAngkot, useAuth, usePerjalanan, useRiwayat } from '@/stores'
 import { AddTransaksi, Angkot, Trayek } from '@/types'
 import { StatusPesanan } from '@/types/statusEnum'
-import { Dialog } from '@capacitor/dialog'
+import { showDialog, showToast } from '@/utils'
 import { Geolocation } from '@capacitor/geolocation'
 import {
   collection,
@@ -265,7 +265,7 @@ const fetchAddres = async (lngLat: LngLatLike) => {
     )
     return await res.json()
   } catch (e: any) {
-    console.error('[fetchAddress] Error fetching address: ', e)
+    await showToast('Terjadi kesalahan memuat alamat', 'danger')
   }
 }
 
@@ -398,7 +398,7 @@ const cariAngkot = async () => {
         map.resize()
         loadPesanan(perjalanan.trayek.kode, perjalanan.angkot.docId)
       }, 100)
-    : await Dialog.alert({
+    : await showDialog({
         message:
           'Tidak ada angkot tersedia untuk saat ini. Silahkan coba lagi nanti',
       })
@@ -462,7 +462,7 @@ const loadPesanan = async (trayek: string, docID: string) => {
       }
     })
   } catch (e: any) {
-    console.log(e)
+    await showToast('Terjadi kesalahan memuat detail pesanan', 'danger')
   }
 }
 
@@ -518,7 +518,7 @@ const pesananDiproses = async (data: any) => {
 
   if (!locationWatcher.value) {
     locationWatcher.value = await Geolocation.watchPosition(
-      { enableHighAccuracy: true, timeout: 3000 },
+      { enableHighAccuracy: true, timeout: 5000 },
       async (pos) => {
         const coords = pos.coords
         destinasi.value.markerJemput.setLngLat([
@@ -595,7 +595,7 @@ const addTransaksi = async () => {
     }
     const res = await riwayat.addTransaksi(data)
   } catch (e: any) {
-    console.error(e)
+    await showToast('Terjadi kesalahan menambah transaksi', 'danger')
   }
 }
 

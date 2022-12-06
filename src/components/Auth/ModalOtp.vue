@@ -24,55 +24,45 @@
 </template>
 
 <script lang="ts" setup>
-import AppLayout from "@/layouts/AppLayout.vue";
-import { useAuth } from "@/stores";
-import { Dialog } from "@capacitor/dialog";
-import {
-  IonButton,
-  IonButtons,
-  IonIcon,
-  IonLabel,
-  IonTitle,
-  IonToolbar,
-  modalController,
-} from "@ionic/vue";
-import { arrowBack } from "ionicons/icons";
-import { onMounted, ref } from "vue";
-import VOtpInput from "vue3-otp-input";
-import ModalLayout from "../ModalLayout.vue";
+import { useAuth } from '@/stores'
+import { showDialog } from '@/utils'
+import { IonButton, IonLabel, modalController } from '@ionic/vue'
+import { onMounted, ref } from 'vue'
+import VOtpInput from 'vue3-otp-input'
+import ModalLayout from '../ModalLayout.vue'
 
-const auth = useAuth();
+const auth = useAuth()
 
 const props = defineProps({
   phone: {
     type: String,
     required: true,
   },
-});
+})
 
-const pin = ref("");
+const pin = ref('')
 
-onMounted(() => requestOtp());
+onMounted(() => requestOtp())
 
 const handleOnComplete = (value: string) => {
-  pin.value = value;
-};
+  pin.value = value
+}
 
-const closeModal = (data: any) => modalController.dismiss(data);
+const closeModal = (data: any) => modalController.dismiss(data)
 
-const requestOtp = async () => await auth.requestOTP(props.phone);
+const requestOtp = async () => await auth.requestOTP(props.phone)
 
 const checkOtp = async () => {
-  const res = await auth.checkOTP(props.phone, pin.value);
-  const data = await res.data;
+  const res = await auth.checkOTP(props.phone, pin.value)
+  const data = await res.data
 
   if (data.msg) {
-    await modalController.dismiss(true);
+    await modalController.dismiss(true)
   } else {
-    await Dialog.alert({
-      title: "Error",
-      message: "Kode OTP tidak cocok",
-    });
+    await showDialog({
+      title: 'Error',
+      message: 'Kode OTP tidak cocok',
+    })
   }
-};
+}
 </script>
