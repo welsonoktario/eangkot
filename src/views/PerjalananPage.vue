@@ -47,6 +47,14 @@
                   @click="openModal('Pilih lokasi tujuan', 'tujuan')"
                 ></ion-input>
               </ion-item>
+              <ion-item v-if="estimasiDurasi">
+                <ion-label position="floating">Estimasi Durasi</ion-label>
+                <ion-input :value="estimasiDurasi" readonly></ion-input>
+              </ion-item>
+              <ion-item v-if="estimasiOngkos">
+                <ion-label position="floating">Estimasi Ongkos</ion-label>
+                <ion-input :value="estimasiOngkos" readonly></ion-input>
+              </ion-item>
               <e-a-button
                 v-if="destinasi.trayek"
                 @click="cariAngkot()"
@@ -57,7 +65,7 @@
             </ion-list>
           </ion-col>
         </ion-row>
-        <CardAngkot
+        <card-angkot
           v-else-if="perjalanan.isPerjalananStarted && perjalanan.angkot"
           :angkot="perjalanan.angkot"
         />
@@ -79,7 +87,13 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { useAngkot, useAuth, usePerjalanan, useRiwayat } from '@/stores'
 import { AddTransaksi, Angkot, Trayek } from '@/types'
 import { StatusPesanan } from '@/types/statusEnum'
-import { showDialog, showToast } from '@/utils'
+import {
+  calculateOngkos,
+  forHumans,
+  rupiah,
+  showDialog,
+  showToast,
+} from '@/utils'
 import { Geolocation } from '@capacitor/geolocation'
 import {
   collection,
@@ -113,7 +127,7 @@ import {
   Map,
   Marker,
 } from 'mapbox-gl'
-import { inject, onMounted, onUnmounted, ref } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 
 type DestinasiType = {
   trayek: Trayek | undefined
@@ -150,6 +164,7 @@ const destinasi = ref<DestinasiType>({
   textJemput: '',
   textTujuan: '',
 })
+const estimasiRoute = ref<any>()
 const cariType = ref('jemput')
 const angkotUnsubscribe = ref<Unsubscribe>()
 const perjalananUnsubscribe = ref<Unsubscribe>()
@@ -228,16 +243,30 @@ onMounted(async () => {
   }
 })
 
-const getRoute = async () => {
+const estimasiOngkos = computed(() =>
+  !estimasiRoute.value
+    ? null
+    : rupiah(calculateOngkos(estimasiRoute.value?.distance))
+)
+const estimasiDurasi = computed(() =>
+  !estimasiRoute.value ? null : forHumans(estimasiRoute.value?.duration)
+)
+
+const getRoute = () => {
   const jemput = destinasi.value.jemput.join(',')
   const tujuan = destinasi.value.tujuan.join(',')
 
-  await fetch(
+  fetch(
     `https://api.mapbox.com/directions/v5/mapbox/driving/${jemput};${tujuan}?geometries=geojson&access_token=${accessToken}`
   )
     .then((res) => res.json())
     .then((data) => {
       const route = data.routes[0]
+      estimasiRoute.value = route
+      perjalanan.setDurasiDanOngkos(
+        route.duration,
+        calculateOngkos(route.distance)
+      )
       const ls: LineString = route.geometry
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -446,16 +475,12 @@ const loadPesanan = async (trayek: string, docID: string) => {
       const data = docs.docs[0].data()
 
       if (data.status == StatusPesanan.ACCEPT) {
-        await pesananDiterima(data)
+        await pesananDiterima()
       } else if (data.status == StatusPesanan.PROCESS) {
         await pesananDiproses(data)
       } else if (data.status == StatusPesanan.DONE) {
-        await Geolocation.clearWatch({
-          id: locationWatcher.value,
-        })
-        if (jemputUnsubscriber.value) {
-          jemputUnsubscriber.value()
-        }
+        await Geolocation.clearWatch({ id: locationWatcher.value })
+        jemputUnsubscriber.value && jemputUnsubscriber.value()
         perjalanan.$reset()
         unsub()
         alert('done')
@@ -466,10 +491,10 @@ const loadPesanan = async (trayek: string, docID: string) => {
   }
 }
 
-const pesananDiterima = async (data: any) => {
+const pesananDiterima = async () => {
   const docRef = doc(
     db,
-    `angkots-${perjalanan.trayek}/${perjalanan.angkot.docId}`
+    `angkots-${perjalanan.trayek.kode}/${perjalanan.angkot.docId}`
   )
 
   if (!jemputUnsubscriber.value) {
@@ -495,7 +520,6 @@ const pesananDiterima = async (data: any) => {
 
       fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
     })
-  } else {
   }
 }
 
@@ -508,6 +532,11 @@ const pesananDiproses = async (data: any) => {
     destinasi.value.markerTujuan = new Marker()
       .setLngLat([data.tujuan.longitude, data.tujuan.latitude])
       .addTo(map)
+  } else {
+    destinasi.value.markerTujuan.setLngLat([
+      data.tujuan.longitude,
+      data.tujuan.latitude,
+    ])
   }
 
   if (!destinasi.value.markerJemput) {

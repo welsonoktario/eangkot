@@ -1,4 +1,5 @@
 import { Angkot, Trayek, User } from '@/types'
+import { forHumans, rupiah } from '@/utils'
 import { LngLatLike } from 'mapbox-gl'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
@@ -11,6 +12,8 @@ type PerjalananState = {
   _tujuan: LngLatLike | undefined
   _tujuanStr: string
   _isPerjalananStarted: boolean
+  _durasi: number
+  _ongkos: number
 }
 
 export const usePerjalanan = defineStore('perjalanan', {
@@ -24,6 +27,8 @@ export const usePerjalanan = defineStore('perjalanan', {
       _tujuan: undefined,
       _tujuanStr: '',
       _isPerjalananStarted: false,
+      _durasi: 0,
+      _ongkos: 0,
     }),
   getters: {
     angkot: (state) => state._angkot,
@@ -36,6 +41,10 @@ export const usePerjalanan = defineStore('perjalanan', {
     tujuan: (state) => state._tujuan,
     tujuanStr: (state) => state._tujuanStr,
     isPerjalananStarted: (state) => state._isPerjalananStarted,
+    durasi: (state) => state._durasi,
+    ongkos: (state) => state._ongkos,
+    durasiStr: (state) => forHumans(state._durasi),
+    ongkosStr: (state) => rupiah(state._ongkos),
   },
   actions: {
     cariAngkot(trayek: Trayek, jemput: LngLatLike, tujuan: LngLatLike) {
@@ -45,6 +54,10 @@ export const usePerjalanan = defineStore('perjalanan', {
     },
     setAngkot(angkot: Angkot) {
       this._angkot = angkot
+    },
+    setDurasiDanOngkos(durasi: number, ongkos: number) {
+      this._durasi = durasi
+      this._ongkos = ongkos
     },
   },
 })
