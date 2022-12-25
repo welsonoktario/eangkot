@@ -1,47 +1,47 @@
 <template>
-  <AppLayout :fullscreen="true">
+  <app-layout :fullscreen="true">
     <template #content>
-      <IonGrid style="height: 100%" class="ion-padding-bottom">
-        <IonRow style="height: 50%">
-          <IonCol>
-            <h1 class="ion-text-center">eAngkot</h1>
-          </IonCol>
-        </IonRow>
-        <IonRow
+      <ion-grid style="height: 100%" class="ion-padding-bottom">
+        <ion-row style="height: 50%">
+          <ion-col>
+            <h1 class="ion-text-center font-bold font-serif">eAngkot</h1>
+          </ion-col>
+        </ion-row>
+        <ion-row
           class="ion-align-items-end ion-padding-horizontal"
           style="height: 50%"
         >
-          <IonCol>
-            <IonList lines="full">
+          <ion-col>
+            <ion-list lines="full">
               <form class="ion-margin-horizontal" @submit.prevent="otp()">
-                <IonItem>
-                  <IonLabel position="floating">No. HP</IonLabel>
-                  <IonInput required v-model="phone" type="tel"></IonInput>
-                </IonItem>
-                <IonButton
+                <ion-item>
+                  <ion-label position="floating">No. HP</ion-label>
+                  <ion-input required v-model="phone" type="tel"></ion-input>
+                </ion-item>
+                <e-a-button
                   class="ion-margin-vertical"
                   expand="block"
                   color="primary"
                   type="submit"
                 >
                   Mulai
-                </IonButton>
+                </e-a-button>
               </form>
-            </IonList>
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+            </ion-list>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </template>
-  </AppLayout>
+  </app-layout>
 </template>
 
 <script lang="ts" setup>
-import ModalOtp from "@/components/Auth/ModalOtp.vue";
-import AppLayout from "@/layouts/AppLayout.vue";
-import { User } from "@/types/user";
-import { useAuth } from "@/stores/auth";
+import ModalOtp from '@/components/Auth/ModalOtp.vue'
+import EAButton from '@/components/EAButton.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { useAuth } from '@/stores/auth'
+import { User } from '@/types/user'
 import {
-  IonButton,
   IonCol,
   IonGrid,
   IonInput,
@@ -51,12 +51,12 @@ import {
   IonRow,
   modalController,
   useIonRouter,
-} from "@ionic/vue";
-import { ref } from "vue";
+} from '@ionic/vue'
+import { ref } from 'vue'
 
-const ionRouter = useIonRouter();
-const auth = useAuth();
-const phone = ref("");
+const ionRouter = useIonRouter()
+const auth = useAuth()
+const phone = ref('')
 
 /* const loginOld = async () => {
   const res = await axios.post("auth/login", { phone: phone.value });
@@ -72,17 +72,17 @@ const phone = ref("");
 }; */
 
 const login = async () => {
-  const res = await auth.login(phone.value);
-  const data = await res.data;
+  const res = await auth.login(phone.value)
+  const data = await res.data
 
-  if (data.msg === "REGISTERED") {
-    await auth.setAuthUser(data.data.user as User, data.data.token);
+  if (data.msg === 'REGISTERED') {
+    await auth.setAuthUser(data.data.user as User, data.data.token)
 
-    ionRouter.push("/tabs/home");
-  } else if (data.msg === "REGISTER") {
-    ionRouter.push(`/auth/register/${phone.value}`);
+    ionRouter.push('/tabs/home')
+  } else if (data.msg === 'REGISTER') {
+    ionRouter.push(`/auth/register/${phone.value}`)
   }
-};
+}
 
 const otp = async () => {
   const modal = await modalController.create({
@@ -91,16 +91,16 @@ const otp = async () => {
       phone: phone.value,
     },
     canDismiss: true,
-  });
+  })
 
-  await modal.present();
+  await modal.present()
 
-  const verified: boolean = (await modal.onDidDismiss()).data;
+  const verified: boolean = (await modal.onDidDismiss()).data
 
   if (verified) {
-    login();
+    login()
   }
-};
+}
 </script>
 
 <style scoped>
@@ -122,5 +122,10 @@ ion-spinner {
   height: 28px;
   stroke: #444;
   fill: #222;
+}
+
+.font-bold {
+  font-weight: 700;
+  color: var(--ion-color-primary);
 }
 </style>

@@ -1,34 +1,40 @@
 <template>
-  <ModalLayout title="Verifikasi Kode OTP" @start-click="closeModal(null)">
+  <modal-layout title="Verifikasi Kode OTP" @start-click="closeModal(null)">
     <template #content>
-      <ion-label>Kode OTP</ion-label>
-      <div style="display: flex; flex-direction: row; width: 100%">
-        <v-otp-input
-          ref="pin"
-          separator="-"
-          :num-inputs="4"
-          :should-auto-focus="true"
-          :is-input-num="true"
-          :placeholder="['*', '*', '*', '*']"
-          @on-complete="handleOnComplete"
-        />
+      <div class="ion-margin">
+        <ion-label>
+          <h2>Masukkan kode OTP yang telah dikirim ke nomor {{ phone }}</h2>
+        </ion-label>
+        <div class="otp-wrapper ion-margin-top">
+          <v-otp-input
+            ref="pin"
+            separator="-"
+            input-classes="otp-input"
+            :num-inputs="4"
+            :should-auto-focus="true"
+            :is-input-num="true"
+            :placeholder="['*', '*', '*', '*']"
+            @on-complete="handleOnComplete"
+          />
+        </div>
       </div>
     </template>
 
     <template #footer>
-      <ion-button @click="checkOtp()" class="ion-margin" expand="block">
-        Lanjut
-      </ion-button>
+      <e-a-button @click="checkOtp()" class="ion-margin" expand="block">
+        Verifikasi
+      </e-a-button>
     </template>
-  </ModalLayout>
+  </modal-layout>
 </template>
 
 <script lang="ts" setup>
 import { useAuth } from '@/stores'
 import { showDialog } from '@/utils'
-import { IonButton, IonLabel, modalController } from '@ionic/vue'
+import { IonLabel, modalController } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import VOtpInput from 'vue3-otp-input'
+import EAButton from '../EAButton.vue'
 import ModalLayout from '../ModalLayout.vue'
 
 const auth = useAuth()
@@ -66,3 +72,34 @@ const checkOtp = async () => {
   }
 }
 </script>
+
+<style>
+.otp-wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+.otp-input {
+  width: 100%;
+  height: 50px;
+  padding: 5px;
+  margin: 0 10px;
+  font-size: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+/* Background colour of an input field with value */
+.otp-input::-webkit-inner-spin-button,
+.otp-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input::placeholder {
+  font-size: 15px;
+  text-align: center;
+  font-weight: 600;
+}
+</style>

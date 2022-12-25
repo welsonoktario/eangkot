@@ -1,31 +1,31 @@
 <template>
-  <AppLayout>
+  <app-layout>
     <template #header>
-      <AppBar title="Daftar Akun">
+      <app-bar title="Daftar Akun">
         <template #start>
           <ion-buttons>
             <ion-back-button></ion-back-button>
           </ion-buttons>
         </template>
-      </AppBar>
+      </app-bar>
     </template>
 
     <template #content>
-      <IonList>
-        <IonItem>
-          <IonLabel position="floating">Nama</IonLabel>
-          <IonInput
+      <ion-list>
+        <ion-item>
+          <ion-label position="floating">Nama</ion-label>
+          <ion-input
             required
             type="text"
             autocomplete="name"
             v-model="nama"
-          ></IonInput>
-        </IonItem>
-      </IonList>
+          ></ion-input>
+        </ion-item>
+      </ion-list>
     </template>
 
     <template #footer>
-      <IonButton
+      <e-a-button
         @click="register()"
         class="ion-margin"
         expand="block"
@@ -33,19 +33,19 @@
         :disabled="nama ? false : true"
       >
         Daftar
-      </IonButton>
+      </e-a-button>
     </template>
-  </AppLayout>
+  </app-layout>
 </template>
 
 <script lang="ts" setup>
 import AppBar from '@/components/AppBar.vue'
+import EAButton from '@/components/EAButton.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useAuth } from '@/stores/auth'
 import { User } from '@/types/user'
 import {
   IonBackButton,
-  IonButton,
   IonButtons,
   IonInput,
   IonItem,

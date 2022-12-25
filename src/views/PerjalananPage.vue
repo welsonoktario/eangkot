@@ -119,8 +119,7 @@ import {
 } from '@ionic/vue'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import buffer from '@turf/buffer'
-import { LineString, point } from '@turf/helpers'
-import { MultiLineString } from 'geojson'
+import { LineString, MultiLineString, point } from '@turf/helpers'
 import {
   GeolocateControl,
   LngLat,

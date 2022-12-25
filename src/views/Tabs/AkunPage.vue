@@ -1,74 +1,63 @@
 <template>
-  <AppLayout>
+  <app-layout>
     <template #header>
-      <AppBar title="Akun" />
+      <app-bar title="Akun" />
     </template>
 
     <template #content>
-      <IonItem class="ion-padding-vertical" lines="none">
-        <IonLabel v-if="auth.authUser" class="ion-text-center">
+      <ion-item class="ion-padding-vertical" lines="none">
+        <ion-label v-if="auth.authUser" class="ion-text-center">
           <h1>{{ auth.authUser.nama }}</h1>
           <p v-if="auth.authUser.email">{{ auth.authUser.email }}</p>
           <p>{{ auth.authUser.noHp }}</p>
-        </IonLabel>
-      </IonItem>
+        </ion-label>
+      </ion-item>
 
-      <IonList lines="full">
-        <IonItem
+      <ion-list lines="full">
+        <ion-item
           routerLink="/tabs/riwayat"
           routerDirection="root"
           button
           detail
         >
-          <IonIcon slot="start" :md="time" :ios="timeOutline"></IonIcon>
-          <IonLabel>Riwayat perjalanan</IonLabel>
-        </IonItem>
-        <IonItem @click="profil()" button detail>
-          <IonIcon slot="start" :md="person" :ios="personOutline"></IonIcon>
-          <IonLabel>Ubah profil</IonLabel>
-        </IonItem>
-        <IonItem @click="password()" button detail>
-          <IonIcon slot="start" :md="key" :ios="keyOutline"></IonIcon>
-          <IonLabel>{{
-            auth.authUser?.hasPassword ? "Ubah password" : "Tambah password"
-          }}</IonLabel>
-        </IonItem>
-        <IonItem @click="share()" button detail>
-          <IonIcon slot="start" :md="people" :ios="peopleOutline"></IonIcon>
-          <IonLabel>Bagikan eAngkot</IonLabel>
-        </IonItem>
-        <IonItem button detail>
-          <IonIcon slot="start" :md="help" :ios="helpCircleOutline"></IonIcon>
-          <IonLabel>Bantuan</IonLabel>
-        </IonItem>
-      </IonList>
-      <IonItem
+          <ion-icon slot="start" :md="time" :ios="timeOutline"></ion-icon>
+          <ion-label>Riwayat perjalanan</ion-label>
+        </ion-item>
+        <ion-item @click="profil()" button detail>
+          <ion-icon slot="start" :md="person" :ios="personOutline"></ion-icon>
+          <ion-label>Ubah profil</ion-label>
+        </ion-item>
+        <ion-item @click="share()" button detail>
+          <ion-icon slot="start" :md="people" :ios="peopleOutline"></ion-icon>
+          <ion-label>Bagikan eAngkot</ion-label>
+        </ion-item>
+      </ion-list>
+      <ion-item
         @click="logout()"
         lines="none"
         class="ion-margin-top"
         button
         detail
       >
-        <IonIcon
+        <ion-icon
           slot="start"
           :md="logOut"
           :ios="logOutOutline"
           color="danger"
-        ></IonIcon>
-        <IonLabel color="danger">Keluar</IonLabel>
-      </IonItem>
+        ></ion-icon>
+        <ion-label color="danger">Keluar</ion-label>
+      </ion-item>
     </template>
-  </AppLayout>
+  </app-layout>
 </template>
 
 <script lang="ts" setup>
-import ModalAkun from "@/components/Akun/ModalAkun.vue";
-import ModalPassword from "@/components/Akun/ModalPassword.vue";
-import AppBar from "@/components/AppBar.vue";
-import AppLayout from "@/layouts/AppLayout.vue";
-import { useAuth } from "@/stores";
-import { showToast } from "@/utils";
-import { Share } from "@capacitor/share";
+import ModalAkun from '@/components/Akun/ModalAkun.vue'
+import AppBar from '@/components/AppBar.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { useAuth } from '@/stores'
+import { showToast } from '@/utils'
+import { Share } from '@capacitor/share'
 import {
   IonIcon,
   IonItem,
@@ -76,12 +65,8 @@ import {
   IonList,
   modalController,
   useIonRouter,
-} from "@ionic/vue";
+} from '@ionic/vue'
 import {
-  help,
-  helpCircleOutline,
-  key,
-  keyOutline,
   logOut,
   logOutOutline,
   people,
@@ -90,54 +75,54 @@ import {
   personOutline,
   time,
   timeOutline,
-} from "ionicons/icons";
-import { getCurrentInstance } from "vue";
+} from 'ionicons/icons'
+import { getCurrentInstance } from 'vue'
 
-const context = getCurrentInstance();
-const auth = useAuth();
-const ionRouter = useIonRouter();
+const context = getCurrentInstance()
+const auth = useAuth()
+const ionRouter = useIonRouter()
 
 const profil = async () => {
   const modal = await modalController.create({
     component: ModalAkun,
     canDismiss: true,
     presentingElement: context.parent.refs.ionRouterOutlet as HTMLElement,
-  });
+  })
 
-  await modal.present();
+  await modal.present()
 
-  const success = await (await modal.onDidDismiss()).data;
+  const success = await (await modal.onDidDismiss()).data
 
   if (success) {
-    await showToast("Profil berhasil diperbarui", "success");
+    await showToast('Profil berhasil diperbarui', 'success')
   }
-};
+}
 
-const password = async () => {
+/* const password = async () => {
   const modal = await modalController.create({
     component: ModalPassword,
     canDismiss: true,
     presentingElement: context.parent.refs.ionRouterOutlet as HTMLElement,
-  });
+  })
 
-  await modal.present();
+  await modal.present()
 
-  const success = await (await modal.onDidDismiss()).data;
+  const success = await (await modal.onDidDismiss()).data
 
   if (success) {
-    await showToast("Password berhasil diperbarui", "success");
+    await showToast('Password berhasil diperbarui', 'success')
   }
-};
+} */
 
 const share = async () =>
   await Share.share({
-    text: "Download dan gunakan eAngkot sekarang juga!",
-    url: "https://google.com/",
-    dialogTitle: "Download eAngkot",
-  });
+    text: 'Download dan gunakan eAngkot sekarang juga!',
+    url: 'https://google.com/',
+    dialogTitle: 'Download eAngkot',
+  })
 
 const logout = async () => {
-  await auth.logout();
-  ionRouter.navigate("/auth/login", "root", "replace");
-};
+  await auth.logout()
+  ionRouter.navigate('/auth/login', 'root', 'replace')
+}
 </script>
