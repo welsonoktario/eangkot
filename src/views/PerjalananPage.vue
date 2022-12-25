@@ -117,8 +117,10 @@ import {
   modalController,
   useIonRouter,
 } from '@ionic/vue'
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import buffer from '@turf/buffer'
-import { LineString, MultiLineString } from '@turf/helpers'
+import { LineString, point } from '@turf/helpers'
+import { MultiLineString } from 'geojson'
 import {
   GeolocateControl,
   LngLat,
@@ -333,9 +335,31 @@ const openModal = async (title: string, type: string) => {
         destinasi.value.textTujuan = data.formatted_address
         perjalanan._tujuanStr = data.formatted_address
       }
-      drawMarker()
+
+      const inRute = checkPointInPolygon([
+        data.geometry.location.lng,
+        data.geometry.location.lat,
+      ])
+
+      if (inRute) {
+        drawMarker()
+      }
     }
   }
+}
+
+const checkPointInPolygon = (pt: number[]) => {
+  let inPolygon: boolean = true
+
+  const trayekSource = map.querySourceFeatures('trayek')
+
+  trayekSource.forEach((source) => {
+    inPolygon = booleanPointInPolygon(point(pt), source.geometry as any)
+
+    if (inPolygon) return
+  })
+
+  return inPolygon
 }
 
 const openModalTrayek = async () => {
@@ -361,21 +385,33 @@ const getCurrentLocation = () => {
 
 const drawMarker = () => {
   if (cariType.value == 'jemput') {
-    destinasi.value.markerJemput = new Marker()
-      .setLngLat(
+    if (!destinasi.value.markerJemput) {
+      destinasi.value.markerJemput = new Marker()
+        .setLngLat(
+          new LngLat(destinasi.value.jemput[0], destinasi.value.jemput[1])
+        )
+        .addTo(map)
+    } else {
+      destinasi.value.markerJemput.setLngLat(
         new LngLat(destinasi.value.jemput[0], destinasi.value.jemput[1])
       )
-      .addTo(map)
+    }
 
     map.flyTo({
       center: destinasi.value.markerJemput.getLngLat(),
     })
   } else {
-    destinasi.value.markerTujuan = new Marker()
-      .setLngLat(
+    if (!destinasi.value.markerTujuan) {
+      destinasi.value.markerTujuan = new Marker()
+        .setLngLat(
+          new LngLat(destinasi.value.tujuan[0], destinasi.value.tujuan[1])
+        )
+        .addTo(map)
+    } else {
+      destinasi.value.markerTujuan.setLngLat(
         new LngLat(destinasi.value.tujuan[0], destinasi.value.tujuan[1])
       )
-      .addTo(map)
+    }
 
     map.flyTo({
       center: destinasi.value.markerTujuan.getLngLat(),
@@ -390,7 +426,7 @@ const drawMarker = () => {
 const drawTrayekLines = async () => {
   const rute = await import(`@/assets/rute-${destinasi.value.kode}.json`)
 
-  const buffered = buffer(rute.geometry as MultiLineString, 75, {
+  const buffered = buffer(rute.geometry as MultiLineString, 25, {
     units: 'meters',
   })
 
@@ -399,8 +435,10 @@ const drawTrayekLines = async () => {
   map.getSource('trayek').setData(buffered)
   const bounds = new LngLatBounds()
 
-  rute.geometry.coordinates[0].forEach(function (feature: any) {
-    bounds.extend(feature)
+  rute.geometry.coordinates.forEach((feature: any) => {
+    feature.forEach((f: any) => {
+      bounds.extend(f)
+    })
   })
 
   map.fitBounds(bounds, {
