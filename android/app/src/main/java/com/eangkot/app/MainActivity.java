@@ -1,4 +1,4 @@
-package com.eangkot.com;
+package com.eangkot.app;
 
 import com.getcapacitor.BridgeActivity;
 

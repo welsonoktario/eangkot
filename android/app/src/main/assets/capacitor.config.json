@@ -1,5 +1,5 @@
 {
-	"appId": "com.eangkot.com",
+	"appId": "com.eangkot.app",
 	"appName": "eAngkot",
 	"webDir": "dist",
 	"bundledWebRuntime": false,

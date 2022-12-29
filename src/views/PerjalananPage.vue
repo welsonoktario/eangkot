@@ -319,46 +319,45 @@ const openModal = async (title: string, type: string) => {
         (res) => (perjalanan._jemputStr = res.results[0].formatted_address)
       )
     } else if (typeof data === 'object') {
-      if (cariType.value == 'jemput') {
-        destinasi.value.jemput = [
-          data.geometry.location.lng,
-          data.geometry.location.lat,
-        ]
-        destinasi.value.textJemput = data.formatted_address
-        perjalanan._jemputStr = data.formatted_address
-      } else {
-        destinasi.value.tujuan = [
-          data.geometry.location.lng,
-          data.geometry.location.lat,
-        ]
-        destinasi.value.textTujuan = data.formatted_address
-        perjalanan._tujuanStr = data.formatted_address
-      }
-
       const inRute = checkPointInPolygon([
         data.geometry.location.lng,
         data.geometry.location.lat,
       ])
 
       if (inRute) {
+        if (cariType.value == 'jemput') {
+          destinasi.value.jemput = [
+            data.geometry.location.lng,
+            data.geometry.location.lat,
+          ]
+          destinasi.value.textJemput = data.formatted_address
+          perjalanan._jemputStr = data.formatted_address
+        } else {
+          destinasi.value.tujuan = [
+            data.geometry.location.lng,
+            data.geometry.location.lat,
+          ]
+          destinasi.value.textTujuan = data.formatted_address
+          perjalanan._tujuanStr = data.formatted_address
+        }
+
         drawMarker()
+      } else {
+        await showDialog({
+          title: 'Error',
+          message: 'Titik lokasi hanya boleh berjarak 25m dari rute trayek.',
+        })
       }
     }
   }
 }
 
 const checkPointInPolygon = (pt: number[]) => {
-  let inPolygon: boolean = true
-
   const trayekSource = map.querySourceFeatures('trayek')
 
-  trayekSource.forEach((source) => {
-    inPolygon = booleanPointInPolygon(point(pt), source.geometry as any)
-
-    if (inPolygon) return
-  })
-
-  return inPolygon
+  return trayekSource.every((source) =>
+    booleanPointInPolygon(point(pt), source.geometry as any)
+  )
 }
 
 const openModalTrayek = async () => {

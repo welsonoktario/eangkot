@@ -19,7 +19,7 @@
     android:theme="@style/AppTheme">
 
     <activity
-      android:name="com.eangkot.com.MainActivity"
+      android:name=".MainActivity"
       android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
       android:exported="true"
       android:label="@string/title_activity_main"
