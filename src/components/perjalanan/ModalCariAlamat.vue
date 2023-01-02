@@ -1,7 +1,8 @@
 <template>
   <modal-layout
     @start-click="closeModal(null)"
-    @end-click="closeModal('pilih')"
+    @end-click="closeModal('from-map')"
+    :end-icon="map"
     :title="title"
   >
     <template #content>
@@ -42,6 +43,7 @@ import {
   IonToolbar,
   modalController,
 } from '@ionic/vue'
+import { map } from 'ionicons/icons'
 import { computed, ref, watch } from 'vue'
 import ModalLayout from '../ModalLayout.vue'
 

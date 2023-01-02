@@ -81,17 +81,8 @@
         </template>
       </ion-list>
 
-      <ion-modal
-        v-if="!transaksi.ulasan"
-        :isOpen="isModalRatingOpen"
-        v-on:didDismiss="isModalRatingOpen = false"
-      >
-        <modal-rating :id="id" />
-      </ion-modal>
-    </template>
-
-    <template v-if="!transaksi.ulasan" #footer>
       <e-a-button
+        v-if="!transaksi.ulasan"
         @click="isModalRatingOpen = true"
         class="ion-margin"
         expand="block"
@@ -99,6 +90,14 @@
       >
         Berikan Ulasan
       </e-a-button>
+
+      <ion-modal
+        v-if="!transaksi.ulasan"
+        :isOpen="isModalRatingOpen"
+        v-on:didDismiss="isModalRatingOpen = false"
+      >
+        <modal-rating :id="id" />
+      </ion-modal>
     </template>
   </modal-layout>
 </template>

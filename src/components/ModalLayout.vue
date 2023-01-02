@@ -14,9 +14,15 @@
       </template>
 
       <template #end v-if="endIcon">
-        <ion-button @click="onEndClick">
-          <ion-icon slot="icon-only" color="primary" :icon="endIcon"></ion-icon>
-        </ion-button>
+        <ion-buttons @click="onEndClick">
+          <e-a-button fill="clear"
+            ><ion-icon
+              slot="icon-only"
+              color="primary"
+              :icon="endIcon"
+            ></ion-icon
+          ></e-a-button>
+        </ion-buttons>
       </template>
     </app-bar>
 
@@ -44,6 +50,7 @@ import {
 import { closeOutline } from 'ionicons/icons'
 import { useSlots } from 'vue'
 import AppBar from './AppBar.vue'
+import EAButton from './EAButton.vue'
 
 defineProps({
   title: String,

@@ -83,6 +83,7 @@ import {
   Firestore,
   GeoPoint,
   onSnapshot,
+  serverTimestamp,
   Unsubscribe,
 } from '@firebase/firestore'
 import { IonLabel, IonTitle, modalController } from '@ionic/vue'
@@ -130,6 +131,7 @@ const cariAngkot = async () => {
       email: user.email,
       noHp: user.noHp,
     },
+    timestamp: serverTimestamp(),
     jemput: new GeoPoint(perjalanan.jemput[1], perjalanan.jemput[0]),
     tujuan: new GeoPoint(perjalanan.tujuan[1], perjalanan.tujuan[0]),
     status: StatusPesanan.PENDING,

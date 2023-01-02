@@ -1,9 +1,14 @@
 <template>
   <app-layout transparent>
     <template #header>
-      <app-bar title="Perjalanan">
+      <app-bar :title="!isFromMap ? 'Perjalanan' : 'Pilih Titik Lokasi'">
         <template #start>
-          <ion-back-button />
+          <ion-back-button v-if="!isFromMap" />
+          <ion-buttons v-else>
+            <e-a-button fill="clear">
+              <ion-icon :icon="close" @click="offMapSelector()"></ion-icon>
+            </e-a-button>
+          </ion-buttons>
         </template>
       </app-bar>
     </template>
@@ -20,7 +25,7 @@
             ></div>
           </ion-col>
         </ion-row>
-        <ion-row v-if="!perjalanan.isPerjalananStarted">
+        <ion-row v-if="!perjalanan.isPerjalananStarted && !isFromMap">
           <ion-col>
             <ion-list class="ion-padding-horizontal" inset>
               <ion-item button detail>
@@ -65,8 +70,13 @@
             </ion-list>
           </ion-col>
         </ion-row>
+        <card-selected-alamat
+          v-if="isFromMap"
+          :address="selectedAddress?.formatted_address"
+          @select="onAddressSelected()"
+        />
         <card-angkot
-          v-else-if="perjalanan.isPerjalananStarted && perjalanan.angkot"
+          v-if="perjalanan.isPerjalananStarted && perjalanan.angkot"
           :angkot="perjalanan.angkot"
         />
       </ion-grid>
@@ -78,6 +88,7 @@
 import AppBar from '@/components/AppBar.vue'
 import EAButton from '@/components/EAButton.vue'
 import CardAngkot from '@/components/Perjalanan/CardAngkot.vue'
+import CardSelectedAlamat from '@/components/Perjalanan/CardSelectedAlamat.vue'
 import ModalCariAlamat from '@/components/Perjalanan/ModalCariAlamat.vue'
 import ModalMencari from '@/components/Perjalanan/ModalMencari.vue'
 import ModalPilihTrayek from '@/components/Perjalanan/ModalPilihTrayek.vue'
@@ -97,8 +108,10 @@ import {
 import { Geolocation } from '@capacitor/geolocation'
 import {
   collection,
+  deleteDoc,
   doc,
   Firestore,
+  getDocs,
   limit,
   onSnapshot,
   query,
@@ -107,8 +120,10 @@ import {
 } from '@firebase/firestore'
 import {
   IonBackButton,
+  IonButtons,
   IonCol,
   IonGrid,
+  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -120,12 +135,14 @@ import {
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import buffer from '@turf/buffer'
 import { LineString, MultiLineString, point } from '@turf/helpers'
+import { close } from 'ionicons/icons'
 import {
   GeolocateControl,
   LngLat,
   LngLatBounds,
   LngLatLike,
   Map,
+  MapboxEvent,
   Marker,
 } from 'mapbox-gl'
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
@@ -171,6 +188,9 @@ const angkotUnsubscribe = ref<Unsubscribe>()
 const perjalananUnsubscribe = ref<Unsubscribe>()
 const jemputUnsubscriber = ref<Unsubscribe>()
 const locationWatcher = ref<string>()
+const isFromMap = ref(false)
+const markerFromMap = ref<Marker>(null)
+const selectedAddress = ref<any>()
 
 onMounted(async () => {
   map = new Map({
@@ -287,7 +307,7 @@ const getRoute = () => {
     })
 }
 
-const fetchAddres = async (lngLat: LngLatLike) => {
+const fetchAddress = async (lngLat: LngLatLike) => {
   try {
     const latLng = (lngLat as number[]).slice().reverse().join(',')
     const res = await fetch(
@@ -296,6 +316,76 @@ const fetchAddres = async (lngLat: LngLatLike) => {
     return await res.json()
   } catch (e: any) {
     await showToast('Terjadi kesalahan memuat alamat', 'danger')
+  }
+}
+
+const onMapMove = (e: MapboxEvent) =>
+  markerFromMap.value.setLngLat(e.target.getCenter())
+const onMapMoveEnd = async (e: MapboxEvent) => {
+  const { lng, lat } = e.target.getCenter()
+  const res = await fetchAddress([lng, lat])
+
+  if (res.status === 'OK') {
+    selectedAddress.value = res.results[0]
+    markerFromMap.value.setLngLat([
+      selectedAddress.value.geometry.location.lng,
+      selectedAddress.value.geometry.location.lat,
+    ])
+  }
+}
+
+const offMapSelector = () => {
+  markerFromMap.value.remove()
+  markerFromMap.value = null
+
+  map.off('move', onMapMove)
+  map.off('moveend', onMapMoveEnd)
+  isFromMap.value = false
+}
+
+const onMapSelector = () => {
+  isFromMap.value = true
+
+  if (!markerFromMap.value) {
+    markerFromMap.value = new Marker().setLngLat(map.getCenter()).addTo(map)
+  } else {
+    markerFromMap.value.setLngLat(map.getCenter())
+  }
+
+  map.on('move', onMapMove)
+  map.on('moveend', onMapMoveEnd)
+}
+
+const onAddressSelected = () => {
+  const inRute = checkPointInPolygon([
+    selectedAddress.value.geometry.location.lng,
+    selectedAddress.value.geometry.location.lat,
+  ])
+
+  if (inRute) {
+    if (cariType.value == 'jemput') {
+      destinasi.value.jemput = [
+        selectedAddress.value.geometry.location.lng,
+        selectedAddress.value.geometry.location.lat,
+      ]
+      destinasi.value.textJemput = selectedAddress.value.formatted_address
+      perjalanan._jemputStr = selectedAddress.value.formatted_address
+    } else {
+      destinasi.value.tujuan = [
+        selectedAddress.value.geometry.location.lng,
+        selectedAddress.value.geometry.location.lat,
+      ]
+      destinasi.value.textTujuan = selectedAddress.value.formatted_address
+      perjalanan._tujuanStr = selectedAddress.value.formatted_address
+    }
+
+    offMapSelector()
+    drawMarker()
+  } else {
+    showDialog({
+      title: 'Error',
+      message: 'Titik lokasi hanya boleh berjarak 25m dari rute trayek.',
+    })
   }
 }
 
@@ -315,7 +405,7 @@ const openModal = async (title: string, type: string) => {
       getCurrentLocation()
       drawMarker()
       destinasi.value.textJemput = 'Lokasi saat ini'
-      fetchAddres(destinasi.value.jemput).then(
+      fetchAddress(destinasi.value.jemput).then(
         (res) => (perjalanan._jemputStr = res.results[0].formatted_address)
       )
     } else if (typeof data === 'object') {
@@ -348,6 +438,8 @@ const openModal = async (title: string, type: string) => {
           message: 'Titik lokasi hanya boleh berjarak 25m dari rute trayek.',
         })
       }
+    } else if (data === 'from-map') {
+      onMapSelector()
     }
   }
 }
@@ -493,10 +585,6 @@ const drawAngkots = () => {
 
 const loadPesanan = async (trayek: string, docID: string) => {
   try {
-    if (map.getLayer('trayek')) {
-      map.removeLayer('trayek')
-    }
-
     if (angkotUnsubscribe.value) {
       angkotUnsubscribe.value()
       angkot.removeMarkers()
@@ -507,19 +595,17 @@ const loadPesanan = async (trayek: string, docID: string) => {
       where('user.id', '==', auth.authUser.id),
       limit(1)
     )
+
     const unsub = onSnapshot(q, async (docs) => {
       const data = docs.docs[0].data()
+      console.log(data.status)
 
       if (data.status == StatusPesanan.ACCEPT) {
         await pesananDiterima()
       } else if (data.status == StatusPesanan.PROCESS) {
         await pesananDiproses(data)
       } else if (data.status == StatusPesanan.DONE) {
-        await Geolocation.clearWatch({ id: locationWatcher.value })
-        jemputUnsubscriber.value && jemputUnsubscriber.value()
-        perjalanan.$reset()
-        unsub()
-        alert('done')
+        await pesananSelesai(unsub)
       }
     })
   } catch (e: any) {
@@ -552,6 +638,8 @@ const pesananDiterima = async () => {
         destinasi.value.markerTujuan = new Marker()
           .setLngLat(perjalanan.jemput)
           .addTo(map)
+      } else {
+        destinasi.value.markerTujuan.setLngLat(perjalanan.jemput)
       }
 
       fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
@@ -579,6 +667,8 @@ const pesananDiproses = async (data: any) => {
     destinasi.value.markerJemput = new Marker()
       .setLngLat(perjalanan.jemput)
       .addTo(map)
+  } else {
+    destinasi.value.markerJemput.setLngLat(perjalanan.jemput)
   }
 
   if (!locationWatcher.value) {
@@ -594,6 +684,33 @@ const pesananDiproses = async (data: any) => {
         fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
       }
     )
+  }
+}
+
+const pesananSelesai = async (unsub: Unsubscribe) => {
+  await Geolocation.clearWatch({ id: locationWatcher.value })
+  jemputUnsubscriber.value && jemputUnsubscriber.value()
+  unsub()
+
+  try {
+    await addTransaksi()
+    const q = query(
+      collection(
+        db,
+        `angkots-${perjalanan.trayek.kode}/${perjalanan.angkot.docId}/penumpangs`
+      ),
+      where('user.id', '==', auth.authUser.id),
+      limit(1)
+    )
+
+    const colRef = await getDocs(q)
+    if (colRef.docs.length) {
+      await deleteDoc(colRef.docs[0].ref)
+    }
+
+    perjalanan.$reset()
+  } catch (e: any) {
+    console.error(e)
   }
 }
 
@@ -652,14 +769,18 @@ const addTransaksi = async () => {
     const data: AddTransaksi = {
       user: auth.authUser.id,
       driver: perjalanan.angkot.driver.id,
-      durasiPerjalanan: 0,
-      jarakPerjalanan: 0,
-      ongkos: 0,
-      lokasiJemput: 'abc',
-      lokasiTujuan: 'cba',
+      durasiPerjalanan: Math.round(estimasiRoute.value?.duration),
+      jarakPerjalanan: parseFloat(
+        Number(estimasiRoute.value.distance).toFixed(3)
+      ),
+      ongkos: calculateOngkos(estimasiRoute.value?.distance),
+      lokasiJemput: destinasi.value.textJemput,
+      lokasiTujuan: destinasi.value.textTujuan,
     }
     const res = await riwayat.addTransaksi(data)
+    await openModalRating(res.data.data.id)
   } catch (e: any) {
+    console.error(e)
     await showToast('Terjadi kesalahan menambah transaksi', 'danger')
   }
 }

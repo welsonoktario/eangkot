@@ -24,9 +24,6 @@
           ></ion-textarea>
         </ion-item>
       </ion-list>
-    </template>
-
-    <template #footer>
       <e-a-button
         @click="addUlasan()"
         class="ion-margin"
@@ -40,11 +37,11 @@
 </template>
 
 <script lang="ts" setup>
-import EAButton from "@/components/EAButton.vue";
-import ModalLayout from "@/components/ModalLayout.vue";
-import { useRiwayat } from "@/stores";
-import { Ulasan } from "@/types";
-import { showToast } from "@/utils";
+import EAButton from '@/components/EAButton.vue'
+import ModalLayout from '@/components/ModalLayout.vue'
+import { useRiwayat } from '@/stores'
+import { Ulasan } from '@/types'
+import { showToast } from '@/utils'
 import {
   IonIcon,
   IonItem,
@@ -54,39 +51,39 @@ import {
   IonSelectOption,
   IonTextarea,
   modalController,
-} from "@ionic/vue";
-import { star, starOutline } from "ionicons/icons";
-import { ref } from "vue";
+} from '@ionic/vue'
+import { star, starOutline } from 'ionicons/icons'
+import { ref } from 'vue'
 
 const props = defineProps({
   id: {
     type: Number,
     required: true,
   },
-});
+})
 
-const riwayat = useRiwayat();
+const riwayat = useRiwayat()
 const ulasan = ref<Ulasan>({
   id: 0,
   rating: 0,
-  komentar: "",
-});
+  komentar: '',
+})
 
-const back = async () => await modalController.dismiss();
+const back = async () => await modalController.dismiss()
 
 const addUlasan = async () => {
-  const transaksi = riwayat.findTransaksi(props.id);
-  const res = await riwayat.addUlasan(props.id, ulasan.value);
-  const { data, status } = res;
+  const transaksi = riwayat.findTransaksi(props.id)
+  const res = await riwayat.addUlasan(props.id, ulasan.value)
+  const { data, status } = res
 
   if (status !== 500) {
-    transaksi.ulasan = data.data;
-    await modalController.dismiss();
-    showToast("Ulasan berhasil ditambahkan", "success");
+    transaksi.ulasan = data.data
+    await modalController.dismiss()
+    showToast('Ulasan berhasil ditambahkan', 'success')
   } else {
-    showToast("Terjadi kesalahan sistem", "danger");
+    showToast('Terjadi kesalahan sistem', 'danger')
   }
-};
+}
 </script>
 
 <style scoped>
