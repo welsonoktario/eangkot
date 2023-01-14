@@ -22,6 +22,9 @@ export const useRiwayat = defineStore('riwayat', {
     findTransaksi(id: number) {
       return this._transaksis.find((p: Transaksi) => p.id === id)
     },
+    prependTransaksi(transaksi: Transaksi) {
+      this._transaksis.unshift(transaksi)
+    },
     loadRiwayat() {
       const error = ref<any | null>(null)
       const loading = ref<boolean>(true)

@@ -64,6 +64,7 @@
             <ion-label class="ion-margin-top ion-margin-horizontal">
               Kami sedang menyiapkan angkot untuk perjalanan anda
             </ion-label>
+            <e-a-button fill="clear" color="danger">Batalkan Pesanan</e-a-button>
           </div>
         </div>
       </div>
@@ -88,6 +89,7 @@ import {
 } from '@firebase/firestore'
 import { IonLabel, IonTitle, modalController } from '@ionic/vue'
 import { inject, onMounted, ref, watch } from 'vue'
+import EAButton from '../EAButton.vue'
 
 const db: Firestore = inject('db')
 const angkot = useAngkot()

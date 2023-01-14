@@ -10,7 +10,7 @@
           <span>
             <ion-icon :icon="star" color="primary"></ion-icon>
           </span>
-          4.3
+          {{ angkot.driver.rating.toFixed(1) }}
         </ion-label>
       </ion-item>
     </ion-row>

@@ -778,6 +778,7 @@ const addTransaksi = async () => {
       lokasiTujuan: destinasi.value.textTujuan,
     }
     const res = await riwayat.addTransaksi(data)
+    riwayat.prependTransaksi(res.data.data)
     await openModalRating(res.data.data.id)
   } catch (e: any) {
     console.error(e)
