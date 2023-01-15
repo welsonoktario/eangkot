@@ -158,6 +158,13 @@ type DestinasiType = {
   textTujuan: string
 }
 
+const markerJemputEl = document.createElement('div')
+markerJemputEl.className = 'marker-jemput'
+const markerTujuanEl = document.createElement('div')
+markerTujuanEl.className = 'marker-tujuan'
+const markerAngkotEl = document.createElement('div')
+markerAngkotEl.className = 'marker-angkot'
+
 const db: Firestore = inject('db')
 const coords = useCurrentLocation()
 const auth = useAuth()
@@ -343,11 +350,15 @@ const offMapSelector = () => {
   isFromMap.value = false
 }
 
-const onMapSelector = () => {
+const onMapSelector = (tipe: string) => {
   isFromMap.value = true
 
   if (!markerFromMap.value) {
-    markerFromMap.value = new Marker().setLngLat(map.getCenter()).addTo(map)
+    markerFromMap.value = new Marker(
+      tipe == 'jemput' ? markerJemputEl : markerTujuanEl
+    )
+      .setLngLat(map.getCenter())
+      .addTo(map)
   } else {
     markerFromMap.value.setLngLat(map.getCenter())
   }
@@ -439,7 +450,7 @@ const openModal = async (title: string, type: string) => {
         })
       }
     } else if (data === 'from-map') {
-      onMapSelector()
+      onMapSelector(cariType.value)
     }
   }
 }
@@ -476,7 +487,7 @@ const getCurrentLocation = () => {
 const drawMarker = () => {
   if (cariType.value == 'jemput') {
     if (!destinasi.value.markerJemput) {
-      destinasi.value.markerJemput = new Marker()
+      destinasi.value.markerJemput = new Marker(markerJemputEl)
         .setLngLat(
           new LngLat(destinasi.value.jemput[0], destinasi.value.jemput[1])
         )
@@ -492,7 +503,7 @@ const drawMarker = () => {
     })
   } else {
     if (!destinasi.value.markerTujuan) {
-      destinasi.value.markerTujuan = new Marker()
+      destinasi.value.markerTujuan = new Marker(markerTujuanEl)
         .setLngLat(
           new LngLat(destinasi.value.tujuan[0], destinasi.value.tujuan[1])
         )
@@ -624,7 +635,7 @@ const pesananDiterima = async () => {
       const angkot = doc.data()
 
       if (!destinasi.value.markerJemput) {
-        destinasi.value.markerJemput = new Marker()
+        destinasi.value.markerJemput = new Marker(markerAngkotEl)
           .setLngLat([angkot.lokasi.longitude, angkot.lokasi.latitude])
           .addTo(map)
       } else {
@@ -635,7 +646,7 @@ const pesananDiterima = async () => {
       }
 
       if (!destinasi.value.markerTujuan) {
-        destinasi.value.markerTujuan = new Marker()
+        destinasi.value.markerTujuan = new Marker(markerJemputEl)
           .setLngLat(perjalanan.jemput)
           .addTo(map)
       } else {
@@ -653,7 +664,7 @@ const pesananDiproses = async (data: any) => {
   }
 
   if (!destinasi.value.markerTujuan) {
-    destinasi.value.markerTujuan = new Marker()
+    destinasi.value.markerTujuan = new Marker(markerTujuanEl)
       .setLngLat([data.tujuan.longitude, data.tujuan.latitude])
       .addTo(map)
   } else {
@@ -664,7 +675,7 @@ const pesananDiproses = async (data: any) => {
   }
 
   if (!destinasi.value.markerJemput) {
-    destinasi.value.markerJemput = new Marker()
+    destinasi.value.markerJemput = new Marker(markerAngkotEl)
       .setLngLat(perjalanan.jemput)
       .addTo(map)
   } else {
