@@ -64,7 +64,9 @@
             <ion-label class="ion-margin-top ion-margin-horizontal">
               Kami sedang menyiapkan angkot untuk perjalanan anda
             </ion-label>
-            <e-a-button fill="clear" color="danger">Batalkan Pesanan</e-a-button>
+            <e-a-button v-if="isCancelable" fill="clear" color="danger"
+              >Batalkan Pesanan</e-a-button
+            >
           </div>
         </div>
       </div>
@@ -73,6 +75,7 @@
 </template>
 
 <script lang="ts" setup>
+import EAButton from '@/components/EAButton.vue'
 import ModalLayout from '@/components/ModalLayout.vue'
 import { useAngkot, useAuth, usePerjalanan } from '@/stores'
 import { Trayek } from '@/types'
@@ -80,7 +83,10 @@ import { StatusPesanan } from '@/types/statusEnum'
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
+  DocumentData,
+  DocumentReference,
   Firestore,
   GeoPoint,
   onSnapshot,
@@ -89,7 +95,6 @@ import {
 } from '@firebase/firestore'
 import { IonLabel, IonTitle, modalController } from '@ionic/vue'
 import { inject, onMounted, ref, watch } from 'vue'
-import EAButton from '../EAButton.vue'
 
 const db: Firestore = inject('db')
 const angkot = useAngkot()
@@ -98,9 +103,15 @@ const auth = useAuth()
 const unsub = ref<Unsubscribe>()
 const isRejected = ref(false)
 const blacklist = ref<string[]>([])
+const isCancelable = ref(false)
+const pesananRef = ref<DocumentReference<DocumentData>>()
 
 onMounted(async () => {
   await cariAngkot()
+
+  setInterval(() => {
+    isCancelable.value = true
+  }, 5000)
 })
 
 watch(isRejected, (next, prev) => {
@@ -113,7 +124,7 @@ const cariAngkot = async () => {
   const angkots = angkot.findAngkots(perjalanan.jemput)
 
   if (angkots.length === 0) {
-    await modalController.dismiss(false)
+    await modalController.dismiss('not-available')
   }
 
   const nearestAngkot = angkots[0]
@@ -126,7 +137,7 @@ const cariAngkot = async () => {
   const colRef = collection(docRef, 'penumpangs')
   const user = auth.authUser
 
-  const pesananRef = await addDoc(colRef, {
+  pesananRef.value = await addDoc(colRef, {
     user: {
       id: user.id,
       nama: user.nama,
@@ -139,7 +150,7 @@ const cariAngkot = async () => {
     status: StatusPesanan.PENDING,
   })
 
-  unsub.value = onSnapshot(pesananRef, async (doc) => {
+  unsub.value = onSnapshot(pesananRef.value, async (doc) => {
     const data = doc.data()
     if (data.status === StatusPesanan.ACCEPT) {
       unsub.value()
@@ -147,12 +158,18 @@ const cariAngkot = async () => {
       perjalanan.setAngkot(nearestAngkot)
       perjalanan._isPerjalananStarted = true
 
-      await modalController.dismiss(true)
+      await modalController.dismiss('accept')
     } else if (data.status === StatusPesanan.CANCEL) {
       blacklist.value.push(nearestAngkot.docId)
       cariAngkot()
     }
   })
+}
+
+const cancel = async () => {
+  unsub.value && unsub.value()
+  await deleteDoc(pesananRef.value)
+  await modalController.dismiss('cancel')
 }
 </script>
 

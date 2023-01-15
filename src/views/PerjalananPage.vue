@@ -561,15 +561,17 @@ const cariAngkot = async () => {
 
   const { data } = await modal.onDidDismiss()
 
-  data
-    ? setTimeout(() => {
-        map.resize()
-        loadPesanan(perjalanan.trayek.kode, perjalanan.angkot.docId)
-      }, 100)
-    : await showDialog({
-        message:
-          'Tidak ada angkot tersedia untuk saat ini. Silahkan coba lagi nanti',
-      })
+  if (data == 'accept') {
+    setTimeout(() => {
+      map.resize()
+      loadPesanan(perjalanan.trayek.kode, perjalanan.angkot.docId)
+    }, 100)
+  } else if (data == 'not-available') {
+    await showDialog({
+      message:
+        'Tidak ada angkot tersedia untuk saat ini. Silahkan coba lagi nanti',
+    })
+  }
 }
 
 const loadAngkots = async () => {
@@ -653,7 +655,7 @@ const pesananDiterima = async () => {
         destinasi.value.markerTujuan.setLngLat(perjalanan.jemput)
       }
 
-      fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
+      // fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
     })
   }
 }
@@ -692,7 +694,7 @@ const pesananDiproses = async (data: any) => {
           coords.latitude,
         ])
 
-        fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
+        // fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
       }
     )
   }
@@ -725,7 +727,7 @@ const pesananSelesai = async (unsub: Unsubscribe) => {
   }
 }
 
-const fetchRoute = async (jemput: Marker, tujuan: Marker) => {
+/* const fetchRoute = async (jemput: Marker, tujuan: Marker) => {
   const jemputStr = jemput.getLngLat().toArray().join(',')
   const tujuanStr = tujuan.getLngLat().toArray().join(',')
 
@@ -737,9 +739,9 @@ const fetchRoute = async (jemput: Marker, tujuan: Marker) => {
   const ls: LineString = route.geometry
 
   setOrUpdateLayer(ls)
-}
+} */
 
-const setOrUpdateLayer = (geom: any) => {
+/* const setOrUpdateLayer = (geom: any) => {
   if (!map.getSource('perjalanan')) {
     map.addSource('perjalanan', {
       type: 'geojson',
@@ -773,7 +775,7 @@ const setOrUpdateLayer = (geom: any) => {
   map.fitBounds(bounds, {
     padding: 20,
   })
-}
+} */
 
 const addTransaksi = async () => {
   try {
