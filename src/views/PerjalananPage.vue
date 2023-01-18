@@ -297,10 +297,6 @@ const getRoute = () => {
       )
       const ls: LineString = route.geometry
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      map.getSource('route').setData(ls)
-
       const bounds = new LngLatBounds(ls[0], ls[0])
 
       // Extend the 'LngLatBounds' to include every coordinate in the bounds result.

@@ -22,6 +22,9 @@ const calcCrow = (coord1: LngLatLike, coord2: LngLatLike) => {
 
 const toRad = (value: number) => (value * Math.PI) / 180
 
+const markerAngkotEl = document.createElement('div')
+markerAngkotEl.className = 'marker-angkot'
+
 export const useAngkot = defineStore('angkot', {
   state: () =>
     reactive({
@@ -47,7 +50,7 @@ export const useAngkot = defineStore('angkot', {
       }
 
       this._angkots.forEach((angkot: Angkot) => {
-        const marker = new Marker().setLngLat(angkot.lokasi)
+        const marker = new Marker(markerAngkotEl).setLngLat(angkot.lokasi)
         this._markers.push(marker)
       })
     },
