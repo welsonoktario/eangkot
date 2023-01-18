@@ -69,7 +69,7 @@ const register = async () => {
 
   if (data.status == 'OK') {
     await auth.setAuthUser(data.data.user as User, data.data.token)
-    ionRouter.push('/tabs/home')
+    ionRouter.navigate('/tabs/home', 'root', 'replace')
   }
 }
 </script>

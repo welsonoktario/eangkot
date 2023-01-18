@@ -632,24 +632,20 @@ const pesananDiterima = async () => {
     jemputUnsubscriber.value = onSnapshot(docRef, async (doc) => {
       const angkot = doc.data()
 
-      if (!destinasi.value.markerJemput) {
-        destinasi.value.markerJemput = new Marker(markerAngkotEl)
-          .setLngLat([angkot.lokasi.longitude, angkot.lokasi.latitude])
-          .addTo(map)
-      } else {
-        destinasi.value.markerJemput.setLngLat([
-          angkot.lokasi.longitude,
-          angkot.lokasi.latitude,
-        ])
+      if (destinasi.value.markerJemput) {
+        destinasi.value.markerJemput.remove()
+      }
+      destinasi.value.markerJemput = new Marker(markerAngkotEl)
+        .setLngLat([angkot.lokasi.longitude, angkot.lokasi.latitude])
+        .addTo(map)
+
+      if (destinasi.value.markerTujuan) {
+        destinasi.value.markerTujuan.remove()
       }
 
-      if (!destinasi.value.markerTujuan) {
-        destinasi.value.markerTujuan = new Marker(markerJemputEl)
-          .setLngLat(perjalanan.jemput)
-          .addTo(map)
-      } else {
-        destinasi.value.markerTujuan.setLngLat(perjalanan.jemput)
-      }
+      destinasi.value.markerTujuan = new Marker(markerJemputEl)
+        .setLngLat(perjalanan.jemput)
+        .addTo(map)
 
       // fetchRoute(destinasi.value.markerJemput, destinasi.value.markerTujuan)
     })
@@ -661,24 +657,21 @@ const pesananDiproses = async (data: any) => {
     jemputUnsubscriber.value()
   }
 
-  if (!destinasi.value.markerTujuan) {
-    destinasi.value.markerTujuan = new Marker(markerTujuanEl)
-      .setLngLat([data.tujuan.longitude, data.tujuan.latitude])
-      .addTo(map)
-  } else {
-    destinasi.value.markerTujuan.setLngLat([
-      data.tujuan.longitude,
-      data.tujuan.latitude,
-    ])
+  if (destinasi.value.markerTujuan) {
+    destinasi.value.markerTujuan.remove()
   }
 
-  if (!destinasi.value.markerJemput) {
-    destinasi.value.markerJemput = new Marker(markerAngkotEl)
-      .setLngLat(perjalanan.jemput)
-      .addTo(map)
-  } else {
-    destinasi.value.markerJemput.setLngLat(perjalanan.jemput)
+  destinasi.value.markerTujuan = new Marker(markerTujuanEl)
+    .setLngLat([data.tujuan.longitude, data.tujuan.latitude])
+    .addTo(map)
+
+  if (destinasi.value.markerJemput) {
+    destinasi.value.markerJemput.remove()
   }
+
+  destinasi.value.markerJemput = new Marker(markerAngkotEl)
+    .setLngLat(perjalanan.jemput)
+    .addTo(map)
 
   if (!locationWatcher.value) {
     locationWatcher.value = await Geolocation.watchPosition(

@@ -34,8 +34,8 @@ import { showDialog } from '@/utils'
 import { IonLabel, modalController } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import VOtpInput from 'vue3-otp-input'
-import EAButton from '../EAButton.vue'
-import ModalLayout from '../ModalLayout.vue'
+import EAButton from '@/components/EAButton.vue'
+import ModalLayout from '@/components/ModalLayout.vue'
 
 const auth = useAuth()
 
@@ -62,7 +62,7 @@ const checkOtp = async () => {
   const res = await auth.checkOTP(props.phone, pin.value)
   const data = await res.data
 
-  if (data.msg) {
+  if (data.status == 'OK') {
     await modalController.dismiss(true)
   } else {
     await showDialog({

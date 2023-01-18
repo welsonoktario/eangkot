@@ -58,19 +58,6 @@ const ionRouter = useIonRouter()
 const auth = useAuth()
 const phone = ref('')
 
-/* const loginOld = async () => {
-  const res = await axios.post("auth/login", { phone: phone.value });
-  const data = await res.data;
-
-  if (data.msg === "REGISTERED") {
-    await auth.setAuthUser(data.data.user as User, data.data.token);
-
-    ionRouter.push("/tabs/home");
-  } else if (data.msg === "REGISTER") {
-    ionRouter.push(`/auth/register/${phone.value}`);
-  }
-}; */
-
 const login = async () => {
   const res = await auth.login(phone.value)
   const data = await res.data
@@ -78,7 +65,7 @@ const login = async () => {
   if (data.msg === 'REGISTERED') {
     await auth.setAuthUser(data.data.user as User, data.data.token)
 
-    ionRouter.push('/tabs/home')
+    ionRouter.navigate('/tabs/home', 'root', 'replace')
   } else if (data.msg === 'REGISTER') {
     ionRouter.push(`/auth/register/${phone.value}`)
   }
