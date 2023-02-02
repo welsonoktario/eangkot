@@ -10,7 +10,7 @@
           <span>
             <ion-icon :icon="star" color="primary"></ion-icon>
           </span>
-          4.3
+          {{ rating }}
           <a :href="whatsAppUrl">
             <ion-icon :icon="logoWhatsapp" color="primary"></ion-icon>
           </a>
@@ -56,16 +56,25 @@
 import ModalLayout from '@/Components/ModalLayout.vue'
 import { usePerjalanan } from '@/stores'
 import { IonItem, IonLabel, modalController } from '@ionic/vue'
-import { star, logoWhatsapp } from 'ionicons/icons';
-import { computed } from 'vue';
+import { logoWhatsapp, star } from 'ionicons/icons'
+import { computed } from 'vue'
 
-const { angkot, trayek, durasiStr, ongkosStr, jemputStr, tujuanStr } = usePerjalanan()
+const { angkot, trayek, durasiStr, ongkosStr, jemputStr, tujuanStr } =
+  usePerjalanan()
 
 const whatsAppUrl = computed(() => {
   const number = angkot.driver.noHp.replace('0', '+62')
-  console.log(number)
 
   return `whatsapp://send?phone=${number}`
+})
+
+const rating = computed(() => {
+  try {
+    return angkot.driver.rating.toFixed(1)
+  } catch (e) {
+    console.error(e)
+    return 0
+  }
 })
 
 const close = async () => await modalController.dismiss()

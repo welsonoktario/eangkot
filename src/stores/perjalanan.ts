@@ -14,6 +14,7 @@ type PerjalananState = {
   _isPerjalananStarted: boolean
   _durasi: number
   _ongkos: number
+  _distance: number
 }
 
 export const usePerjalanan = defineStore('perjalanan', {
@@ -29,6 +30,7 @@ export const usePerjalanan = defineStore('perjalanan', {
       _isPerjalananStarted: false,
       _durasi: 0,
       _ongkos: 0,
+      _distance: 0,
     }),
   getters: {
     angkot: (state) => state._angkot,
@@ -45,6 +47,7 @@ export const usePerjalanan = defineStore('perjalanan', {
     ongkos: (state) => state._ongkos,
     durasiStr: (state) => forHumans(state._durasi),
     ongkosStr: (state) => rupiah(state._ongkos),
+    distance: (state) => state._distance,
   },
   actions: {
     cariAngkot(trayek: Trayek, jemput: LngLatLike, tujuan: LngLatLike) {
@@ -55,8 +58,9 @@ export const usePerjalanan = defineStore('perjalanan', {
     setAngkot(angkot: Angkot) {
       this._angkot = angkot
     },
-    setDurasiDanOngkos(durasi: number, ongkos: number) {
+    setPerjalananDetail(durasi: number, distance: number, ongkos: number) {
       this._durasi = durasi
+      this._distance = distance
       this._ongkos = ongkos
     },
   },

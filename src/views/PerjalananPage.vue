@@ -291,8 +291,9 @@ const getRoute = () => {
     .then((data) => {
       const route = data.routes[0]
       estimasiRoute.value = route
-      perjalanan.setDurasiDanOngkos(
+      perjalanan.setPerjalananDetail(
         route.duration,
+        route.distance,
         calculateOngkos(route.distance)
       )
       const ls: LineString = route.geometry
@@ -767,13 +768,14 @@ const pesananSelesai = async (unsub: Unsubscribe) => {
 } */
 
 const addTransaksi = async () => {
+  console.log(estimasiRoute.value)
   try {
     const data: AddTransaksi = {
       user: auth.authUser.id,
       driver: perjalanan.angkot.driver.id,
       durasiPerjalanan: Math.round(estimasiRoute.value?.duration),
       jarakPerjalanan: parseFloat(
-        Number(estimasiRoute.value.distance).toFixed(3)
+        Number(estimasiRoute.value.distance).toFixed(2)
       ),
       ongkos: calculateOngkos(estimasiRoute.value?.distance),
       lokasiJemput: destinasi.value.textJemput,

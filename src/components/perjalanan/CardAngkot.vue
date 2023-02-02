@@ -10,7 +10,7 @@
           <span>
             <ion-icon :icon="star" color="primary"></ion-icon>
           </span>
-          {{ angkot.driver.rating.toFixed(1) }}
+          {{ rating }}
         </ion-label>
       </ion-item>
     </ion-row>
@@ -28,13 +28,23 @@ import {
   modalController,
 } from '@ionic/vue'
 import { star } from 'ionicons/icons'
+import { computed } from 'vue'
 import ModalPerjalananDetail from './ModalPerjalananDetail.vue'
 
 type CardAngkotProps = {
   angkot: Angkot
 }
 
-defineProps<CardAngkotProps>()
+const props = defineProps<CardAngkotProps>()
+
+const rating = computed(() => {
+  try {
+    return props.angkot.driver.rating.toFixed(1)
+  } catch (e) {
+    console.error(e)
+    return 0
+  }
+})
 
 const openModalDetail = async () => {
   const modal = await modalController.create({
