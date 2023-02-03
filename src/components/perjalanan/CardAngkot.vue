@@ -1,5 +1,9 @@
 <template>
   <ion-card>
+    <ion-row v-if="statusPesanan !== StatusPesanan.DONE">
+      <h2 v-if="statusPesanan === StatusPesanan.ACCEPT">Pesanan anda telah diterima oleh pengemudi</h2>
+      <h2 v-if="statusPesanan === StatusPesanan.PROCESS">Sedang dalam proses perjalanan</h2>
+    </ion-row>
     <ion-row>
       <ion-item style="width: 100%" button @click="openModalDetail">
         <ion-label>
@@ -19,6 +23,7 @@
 
 <script lang="ts" setup>
 import { Angkot } from '@/types'
+import { StatusPesanan } from '@/types/statusEnum'
 import {
   IonCard,
   IonIcon,
@@ -32,6 +37,7 @@ import { computed } from 'vue'
 import ModalPerjalananDetail from './ModalPerjalananDetail.vue'
 
 type CardAngkotProps = {
+  statusPesanan: StatusPesanan
   angkot: Angkot
 }
 

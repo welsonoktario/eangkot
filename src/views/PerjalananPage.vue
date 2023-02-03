@@ -78,6 +78,7 @@
         <card-angkot
           v-if="perjalanan.isPerjalananStarted && perjalanan.angkot"
           :angkot="perjalanan.angkot"
+          :status-pesanan="statusPesanan"
         />
       </ion-grid>
     </template>
@@ -198,6 +199,7 @@ const locationWatcher = ref<string>()
 const isFromMap = ref(false)
 const markerFromMap = ref<Marker>(null)
 const selectedAddress = ref<any>()
+const statusPesanan = ref<StatusPesanan>()
 
 onMounted(async () => {
   map = new Map({
@@ -608,8 +610,8 @@ const loadPesanan = async (trayek: string, docID: string) => {
 
     const unsub = onSnapshot(q, async (docs) => {
       const data = docs.docs[0].data()
-      console.log(data.status)
 
+      statusPesanan.value = data.status
       if (data.status == StatusPesanan.ACCEPT) {
         await pesananDiterima()
       } else if (data.status == StatusPesanan.PROCESS) {

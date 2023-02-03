@@ -64,7 +64,7 @@
             <ion-label class="ion-margin-top ion-margin-horizontal">
               Kami sedang menyiapkan angkot untuk perjalanan anda
             </ion-label>
-            <e-a-button v-if="isCancelable" fill="clear" color="danger"
+            <e-a-button @click="cancel()" v-if="isCancelable" fill="clear" color="danger"
               >Batalkan Pesanan</e-a-button
             >
           </div>
